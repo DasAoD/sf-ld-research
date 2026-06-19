@@ -23,13 +23,13 @@ GET https://f{server}.sfgame.net/cmd.php?req=IADungeonInteract&params={base64}&s
 |-------|-----------|---------|
 | `1` | Links gehen | Navigation |
 | `2` | Rechts gehen | Navigation |
-| `5` | Schløsselmeister betreten / Kiste interagieren | Interaktionsraum |
+| `5` | Schlüsselmeister betreten / Kiste interagieren | Interaktionsraum |
 | `6` | Fass / Holzkiste öffnen (ohne Schlüssel) | Interaktionsraum |
 | `20` | Kampf starten / Skelett bekämpfen | Kampf |
 | `21` | Fliehen | Kampf / Schmatztruhe |
-| `40` | Tør mit Schløssel öffnen / Truhe/Kiste bestätigen | Interaktion |
+| `40` | Tür mit Schlüssel öffnen / Truhe/Kiste bestätigen | Interaktion |
 | `42` | Raum verlassen ohne Aktion (Truhe nicht öffnen) | Abbruch |
-| `50` | Falle / Opfertør / erleuchteten Durchgang betreten | Navigation |
+| `50` | Falle / Opfertür / erleuchteten Durchgang betreten | Navigation |
 | `51` | Raum verlassen ohne Aktion (Händler ablehnen) | Abbruch |
 | `60` | Kampfergebnis bestätigen | Kampf |
 | `70` | Poll / Zustand abfragen / nächster Schritt | Allgemein |
@@ -38,7 +38,7 @@ GET https://f{server}.sfgame.net/cmd.php?req=IADungeonInteract&params={base64}&s
 | `92` | Schere-Stein-Papier: Schere wählen | SSP-Raum |
 | `93` | Schere-Stein-Papier: Stein? (unbestätigt) | SSP-Raum |
 
-> **Noch unbekannt:** param før Schicksalstør (Glücksrad), Prüfungspforte, Notausgang, hungrige Tør füttern, Gem-Auswahl nach Boss
+> **Noch unbekannt:** param für Schicksalstür (Glücksrad), Prüfungspforte, Notausgang, hungrige Tür füttern, Gem-Auswahl nach Boss
 
 ---
 
@@ -56,7 +56,7 @@ Format: `iadungeon.iadungeonsave:{f0}/{f1}/{f2}/...`
 | `[19]` | Raumzustand (state) | `100` |
 | `[22]` | Objekt/Monster im Raum | `-5085` |
 
-> **Noch unbekannt:** viele andere Felder (Schløssel-Anzahl, aktive Segen/Fløche, Ressourcen, etc.)
+> **Noch unbekannt:** viele andere Felder (Schlüssel-Anzahl, aktive Segen/Flüche, Ressourcen, etc.)
 
 ---
 
@@ -114,7 +114,7 @@ Gilt wenn `state=100` (Interaktionsraum).
 | `500` | Gefräßige Schmatztruhe (verwandelt sich in Monster) |
 | `600` | Opfertruhe |
 | `601` | Verfluchte Truhe |
-| `603` | Satte Kiste (hinter hungriger Tør) |
+| `603` | Satte Kiste (hinter hungriger Tür) |
 
 ### Kisten & Fässer
 
@@ -187,92 +187,105 @@ Tier-Liste und Beschreibungen aus ldgadget.12hp.de + Spieler-Screenshots.
 | Tier | Name (DE) | Name (EN) | Effekt + | Effekt – |
 |------|-----------|-----------|----------|----------|
 | S | Seele des Hasen | Soul of the Rabbit | +40% Fluchtverschance aus Kämpfen | Monster verursachen 25% mehr Schaden |
-| A | Verfluchter Mondstein | Cursed Moonstone | +20% Fluchtverschance | Dauer von Fløchen +1 |
-| A | Spionageklunker | Spying Gem | Chance auf unverschlossene Türen | -15% Schløssel aus Kämpfen |
-| A | Anhänger des Schløsselmeisters | Pendant of the Key Master | 40% Chance nach Fliehen einen Schløssel zu erhalten | Eine Tør ist immer verschlossen |
+| A | Verfluchter Mondstein | Cursed Moonstone | +20% Fluchtverschance | Dauer von Flüchen +1 |
+| A | Spionageklunker | Spying Gem | Chance auf unverschlossene Türen | -15% Schlüssel aus Kämpfen |
+| A | Anhänger des Schlüsselmeisters | Pendant of the Key Master | 40% Chance nach Fliehen einen Schlüssel zu erhalten | Eine Tür ist immer verschlossen |
 | B | Schmieriger Heilstein | Greasy Healing Stone | Nach Tod: Segen "Weg der Besserung" für 3 Räume | Keine epischen Truhen mehr |
-| B | Gløcksspielerbrocken | Boulder of the Gambler | Fallen geben Flüche statt Schaden | – |
+| B | Glücksspielerbrocken | Boulder of the Gambler | Fallen geben Flüche statt Schaden | – |
 | B | Brocken der Gier | Boulder of Greed | Mehr geheimnisvolle Türen; erhöhte Chance auf Segen aus Truhen/Kisten/Leichen | – |
 | C | Schatz des Helden | Treasure of the Hero | Monster verursachen weniger Schaden | Geringere Chance auf Items |
 | C | Diamant des Zeitreisenden | Diamond of the Time Traveler | Segen-Dauer verlängert | Fässer enthalten immer Flüche |
 | C | Hoffnung des Verdurstenden | Hope of the Thirsty One | Mehr verfluchte Türen | – |
 | C | Verfluchte Perle | Cursed Pearl | – | – |
-| C | Blutstropfen der Opfergabe | Blood Drop of Sacrifice | Weniger Schaden durch Opfertøren; mehr Opfertøren | – |
+| C | Blutstropfen der Opfergabe | Blood Drop of Sacrifice | Weniger Schaden durch Opfertüren; mehr Opfertüren | – |
 | D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Türen |
 | E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Türen | – |
-| E | Kronjuwel des Teufels | Crown Jewel of the Devil | Chance auf epische Türen | Hinter Tøren können sich Monster verbergen |
+| E | Kronjuwel des Teufels | Crown Jewel of the Devil | Chance auf epische Türen | Hinter Türen können sich Monster verbergen |
 | F | Kiesel der Hinterlist | Pebble of Deceit | Monster verursachen weniger Schaden | Hinter Türen können sich Monster verbergen |
-| F | Magnetstein | Lodestone | Chance auf doppelt verschlossene Türen; erhöhte Schløsselchance aus Kämpfen | – |
+| F | Magnetstein | Lodestone | Chance auf doppelt verschlossene Türen; erhöhte Schlüsselchance aus Kämpfen | – |
 | F | Auge des Stiers | Eye of the Bull | – | – |
-| F | Irrender Brocken des Tölpels | Erratic Boulder of the Hick | Weniger Opfertøren | – |
-| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen auch hinter verschlossenen Tøren | – |
-| F | Alter Opferstein | Old Sacrifice Stone | Weniger Schaden durch Opfertruhen; Opfertruhen auch hinter verschlossenen Tøren | – |
+| F | Irrender Brocken des Tölpels | Erratic Boulder of the Hick | Weniger Opfertüren | – |
+| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen auch hinter verschlossenen Türen | – |
+| F | Alter Opferstein | Old Sacrifice Stone | Weniger Schaden durch Opfertruhen; Opfertruhen auch hinter verschlossenen Türen | – |
+
+> Teilweise unvollständig – Effekte aus Screenshots und ldgadget.12hp.de zusammengeführt.
 
 ---
 
 ## Segen (Blessings) – bekannte usedbuffs-IDs
 
+Aus den HAR-Analysen bekannte buff-IDs (aus `usedbuffs`-Feld in Responses):
+
 | buff_id | Vermutliche Bedeutung |
 |---------|-----------------------|
-| `1` | Weg der Besserung (HP-Heilung pro Raum) |
-| `2` | One Hit Wonder |
-| `4` | ? |
-| `5` | Schløsselmeister-Segen? |
+| `1` | Weg der Besserung (HP-Heilung pro Raum, sofortige Wirkung?) |
+| `2` | One Hit Wonder (Monster sofort töten) |
+| `4` | ? (aktiv in mehreren Räumen ohne sichtbaren Effekt) |
+| `5` | Schlüsselmeister-Segen? |
 | `8` | Weg der Besserung (HP-Heilung nach Raum) |
 | `101` | ? |
-| `102` | ? (evtl. Fluch) |
+| `102` | ? (HP sinkt nach Raum – evtl. Fluch?) |
 | `104` | ? |
 
 ---
 
-## Sonderbereiche
+## Sonderbereiche (aus ldgadget.12hp.de)
+
+### Goldene Räume / Shops
 
 | Raum | Inhalt |
 |------|--------|
-| Schløsselmeister-Shop | Segen gegen Schløssel tauschen |
-| Key to Failure Shop | Schløssel gegen Flüche tauschen |
-| Lavaraum | 10% Schaden |
-| WAsserraum | Ertrinken nach 10 Sekunden |
+| Schlüsselmeister-Shop | Segen gegen Schlüssel tauschen |
+| Key to Failure Shop | Schlüssel gegen Flüche tauschen |
+| Lavaraum | 10% Schaden; Gems/Flüche ohne Effekt |
+| Wasserraum | Ertrinken nach 10 Sekunden ohne Aktion |
 | Erzähler-Raum | 25% Heilung + Segen |
-| Sarkophag | Gold (episches Item mit Schløssel) |
-| Schere-Stein-Papier | Segen + episches Item bei Gewinn |
-| Gløcksrad | Segen, Fluch, Gold oder Schløssel |
-| Kanalraum | Episches Item |
-| Lebensbrunnen | 25% Heilung |
-| Spinne | 1/2/5 Schløssel |
-| Wunschbrunnen | Gold → episches Item oder Segen |
-| Zeughaus (Räume 90-98) | Episches Item; 10% chance legendär bei 2 Waffen |
+| Sarkophag | Gold (gesperrte Variante mit Schlüssel: episches Item) |
+| Holz/Stein/Arkanes/Seelen-Raum | Ressourcen in Festungsmenge |
+| Schere-Stein-Papier | Segen + episches Item bei Gewinn; Fluch + 10% Schaden bei Verlust |
+| Glücksrad | Segen, Fluch, Gold, Schlüssel oder Schlüsselverlust |
+| Kanalraum | Episches Item (bereits gewaschen) |
+| Lebensbrunnen | 25% Heilung (blaue Variante entfernt auch Flüche) |
+| Spinne | 1/2/5 Schlüssel; Vergiftung bei Pech |
+| Wunschbrunnen | 1 Gold → episches Item oder Segen |
+| Zeughaus (Räume 90–98) | Episches Item; Klassen mit 2 Waffen: 10% Chance auf legendäres Item |
 
-### Monster-Schadenstabelle
+### Monster-Schadenstabelle (% der max. LD-HP)
 
 | Bereich | Min | Avg | Max |
 |---------|-----|-----|-----|
-| Monster 1-24 | 10.98% | 14.24% | 17.49% |
-| Boss 25 | 12.93% | 17.45% | 21.97% |
-| Monster 26-49 | 14.50% | 19.00% | 23.49% |
-| Boss 50 | 18.57% | 23.53% | 28.48% |
-| Monster 51-74 | 14.50% | 19.00% | 23.49% |
-| Boss 75 | 18.57% | 23.53% | 28.48% |
-| Monster 76-99 | 17.30% | 23.65% | 30.00% |
-| Boss 100 | 33.96% | 45.30% | 56.63% |
+| Monster 1–24 | 10,98% | 14,24% | 17,49% |
+| Boss 25 | 12,93% | 17,45% | 21,97% |
+| Monster 26–49 | 14,50% | 19,00% | 23,49% |
+| Boss 50 | 18,57% | 23,53% | 28,48% |
+| Monster 51–74 | 14,50% | 19,00% | 23,49% |
+| Boss 75 | 18,57% | 23,53% | 28,48% |
+| Monster 76–99 | 17,30% | 23,65% | 30,00% |
+| Boss 100 | 33,96% | 45,30% | 56,63% |
 
 ---
 
 ## Noch zu erforschen
 
-- [ ] Prüfungspforte + Notausgang
-- [ ] Schicksalstør, hungrige Tør, Segenstør
-- [ ] Gem-Auswahl nach Boss
-- [ ] 1000er state-Werte entschlüsseln
-- [ ] SSP: param før Stein und Papier
-- [ ] iadungeonsave Felder [4]-[16], [18], [20]-[21], [23]-[50]
-- [ ] Bosse 2-4 (Räume 50, 75, 100)
-- [ ] Legendäre Truhe nach Endboss
+- [ ] Prüfungspforte (state=?, param=?)
+- [ ] Notausgang (state=?, param=?)
+- [ ] Schicksalstür / Glücksrad (param=?)
+- [ ] Hungrige Tür füttern (param=?)
+- [ ] Segenstür (param=?)
+- [ ] Gem-Auswahl nach Boss (param=?)
+- [ ] Alle 1000er state-Werte entschlüsseln
+- [ ] Skelett-monster-Werte (welche IDs?)
+- [ ] SSP: param für Stein und Papier
+- [ ] iadungeonsave Felder [4]–[16], [18], [20]–[21], [23]–[50]
+- [ ] Dungeon-Typ Feld [1]: 1=normal, 2=LD Ultimate?
+- [ ] Ressourcen im Dungeon (Holz, Stein, Seelen, Metall, etc.)
+- [ ] Bosse 2–4 (Räume 50, 75, 100)
+- [ ] Legendäre Truhe nach Endboss (Raum 101?)
 
 ---
 
 ## Quellen
 
-- HAR-Aufzeichnungen: Beedle the Bard, Doriku Gebeule, Eglenn, Gweneth, Haui Kaputti, Medea
+- HAR-Aufzeichnungen: 6 Charakter-Runs auf verschiedenen Servern (F9, F25)
 - Playa Games Helpshift: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/57-legendary-dungeon/
 - ldgadget.12hp.de: https://ldgadget.12hp.de
