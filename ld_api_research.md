@@ -1,6 +1,6 @@
 # Legendary Dungeon – API Research
 
-> Status: **Work in Progress** – basierend auf 12 Charakter-Runs (Räume 1–80)  
+> Status: **Work in Progress** – basierend auf 18 Charakter-Runs (Räume 1–80)  
 > Fehlend: Räume 80–100, Endboss, legendäre Truhe, einige Sonderfälle
 
 ---
@@ -27,18 +27,19 @@ GET https://f{server}.sfgame.net/cmd.php?req=IADungeonInteract&params={base64}&s
 | `6` | Fass / Holzkiste öffnen (ohne Schlüssel) | Interaktionsraum |
 | `20` | Kampf starten / Skelett bekämpfen | Kampf |
 | `21` | Fliehen | Kampf / Schmatztruhe |
-| `40` | Tür mit Schlüssel öffnen / Truhe/Kiste bestätigen | Interaktion |
+| `40` | Tør mit Schlüssel öffnen / Truhe/Kiste bestätigen | Interaktion |
 | `42` | Raum verlassen ohne Aktion (Truhe nicht öffnen) | Abbruch |
-| `50` | Falle / Opfertür / erleuchteten Durchgang / Jungbrunnen betreten | Navigation |
+| `50` | Falle / Opfertür / erleuchteten Durchgang / Jungbrunnen / Goldenen Raum betreten | Navigation |
 | `51` | Raum verlassen ohne Aktion (Händler ablehnen) | Abbruch |
-| `60` | Kampfergebnis bestätigen | Kampf |
-| `70` | Poll / Zustand abfragen / nächster Schritt | Allgemein |
+| `60` | Kampfergebnis / Raum-Aktion bestätigen | Kampf / Interaktion |
+| `70` | Poll / Zustand abfragen / nächster Schritt / Kauf bestätigen | Allgemein |
 | `80` | Händler: in Waren blättern (kostet 1 Pilz) | Händler |
 | `91` | Schere-Stein-Papier: Papier? (unbestätigt) | SSP-Raum |
 | `92` | Schere-Stein-Papier: Schere wählen | SSP-Raum |
 | `93` | Schere-Stein-Papier: Stein? (unbestätigt) | SSP-Raum |
 
-> **Noch unbekannt:** param für Schicksalstür (Glücksrad), hungrige Tør füttern, Gem-Auswahl nach Boss
+> **Hinweis:** Händler-Käufe und Klunker-Auswahl nach Boss erfolgen über `param=70` – kein eigener param!  
+> **Noch unbekannt:** param für Schicksalstür (Glücksrad), hungrige Tür füttern
 
 ---
 
@@ -56,7 +57,7 @@ Format: `iadungeon.iadungeonsave:{f0}/{f1}/{f2}/...`
 | `[19]` | Raumzustand (state) | `100` |
 | `[22]` | Objekt/Monster im Raum | `-5085` |
 
-> **Noch unbekannt:** viele andere Felder (Schløssel-Anzahl, aktive Segen/Fløche, Ressourcen, etc.)
+> **Noch unbekannt:** viele andere Felder (Schlüssel-Anzahl, aktive Segen/Fløche, Ressourcen, etc.)
 
 ---
 
@@ -83,12 +84,13 @@ Format: `iadungeonstats:{a}/{b}/{c}/{d}/{e}`
 | `1` | Monster-Raum |
 | `4` | Boss-Raum (Raum 25 / 50 / 75 / 100) |
 | `100` | Interaktionsraum (Truhe / Fass / Skelett / Kiste) |
-| `200` | Leerer Durchgang / Tør ohne Inhalt |
+| `200` | Leerer Durchgang / Tør ohne Inhalt (kann Falle enthalten) |
 | `301` | Jungbrunnen (HP-Heilung) |
 | `308` | Schere-Stein-Papier-Raum |
+| `309` | Goldene Tür (führt zu goldenem Raum) |
 | `310` | Erleuchteter/Goldener Durchgang |
-| `315` | Schløsselmeister-Händler / Kostenloser Händler (Ebene 1) |
-| `322` | Komplett leerer Raum (kein Objekt, kein Monster) |
+| `315` | Schlüsselmeister-Händler / Kostenloser Händler (Ebene 1) |
+| `322` | Spezialraum ohne Kampf (Arkane Splitter-Höhle, leerer Raum, etc.) |
 | `323` | Fluchhändler-Raum |
 
 ### Post-Raum-Zustände (nach Abschluss eines Raums)
@@ -99,20 +101,22 @@ Diese erscheinen nach param=70 und signalisieren was nach dem Raum passiert ist.
 |-------|-----------|
 | `1000` | Segen erhalten (aus Kiste/Fass/Jungbrunnen) |
 | `1001` | Normaler Abschluss (nächster Raum wählbar) |
-| `1002` | Item oder Ressourcen erhalten (eingepackt/Gold) |
+| `1002` | Auswahl/Bestätigung (Item eingepackt, Klunker gewählt, Gold, etc.) |
 | `1006` | Notausgang-Truhe geöffnet |
-| `1007` | Gold erhalten (Bronzene Schatztruhe) |
-| `1008` | Segen erhalten (nach Raum, z.B. Weg der Besserung) |
-| `1009` | Fluch erhalten |
+| `1007` | Gold erhalten (Skelett zu Staub / Bronzene Schatztruhe) |
+| `1008` | Segen erhalten (nach Raum, z.B. Weg der Besserung aus Fass) |
+| `1009` | Fluch erhalten (aus Tør/Händler) |
 | `1010` | ? |
-| `1011` | Lebenselixier gekauft (sofort HP + maxHP erhöht) |
+| `1011` | Fluch aus Fass erhalten |
 | `1012` | Schaden durch aktiven Fluch (HP sinkt pro Raum) |
-| `1013` | Boss besiegt + Klunker gewählt |
+| `1013` | ? (selten nach Boss) |
 | `1014` | ? |
 | `1015` | ? (nach Fluchhändler verlassen) |
 | `1016` | ? |
 | `1022` | Prüfungspforte bestanden (kein Item) |
 | `1023` | Prüfungspforte bestanden (mit Item/Gold) |
+
+> **Hinweis:** `1002` ist vielseitig – erscheint nach Item einpacken, Klunker wählen nach Boss, Gold aus Kiste, etc.
 
 ---
 
@@ -140,7 +144,7 @@ Gilt wenn `state=100` (Interaktionsraum).
 | `100` | Holzkiste (Gold / Ressourcen) |
 | `101` | Fass (mit Item) |
 | `102` | Holzkiste (mit Item) |
-| `400` | Fass (mit Segen/Fluch) |
+| `400` | Fass (mit Segen oder Fluch) |
 
 ### Skelette
 
@@ -163,7 +167,7 @@ Negative Werte = reguläre Monster-IDs.
 |---------|-----------|
 | `-5002` | Monster mit Laterne (nach erleuchtetem Durchgang) |
 | `-5075` bis `-5099` | Reguläre Dungeon-Monster Ebene 1 (Räume 1–24) |
-| `-5106` bis `-5135` | Reguläre Dungeon-Monster Ebene 2–3 (Räume 26–80) |
+| `-5100` bis `-5135` | Reguläre Dungeon-Monster Ebene 2–3 (Räume 26–80) |
 | `-5142` | Boss 1 (Raum 25) |
 | `-5144` | Boss 2 (Raum 50) |
 | `-5146` | Boss 3 (Raum 75) |
@@ -200,10 +204,11 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/...`
 
 | buff_id | Typ | Bedeutung |
 |---------|-----|-----------|
-| `1` | Segen | Weg der Besserung (HP-Heilung sofort/nach Raum) |
+| `1` | Segen | Plünderer (+100% Gold in 10 Kammern) oder Weg der Besserung |
 | `2` | Segen | One Hit Wonder (Monster sofort töten) |
 | `4` | ? | ? |
-| `5` | Segen | Schløsselmeister-Segen? |
+| `5` | Segen | Dietrich (nächste 4 Türen ohne Schlüssel öffnen) |
+| `6` | Segen | Schlüsselerlebnis (70% Chance auf 2 Schlüssel in 8 Kämpfen) |
 | `8` | Segen | Weg der Besserung (HP-Heilung nach Raum) |
 | `101` | Fluch | Aktiver Fluch beim Kampf |
 | `102` | Fluch | 5% Schaden pro Raum für 5 Räume |
@@ -230,9 +235,40 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/...`
 
 ---
 
+## Goldene Räume (state=309 / state=310)
+
+Goldene Räume sind besondere Räume die hinter goldenen Türen erscheinen.
+
+| state | Bedeutung |
+|-------|-----------|
+| `309` | Goldene Tür (Eingang zum goldenen Raum) |
+| `310` | Erleuchteter/goldener Durchgang |
+
+### Bekannte goldene Raumtypen
+
+| Raum | Inhalt |
+|------|--------|
+| Kanalisation | Item aus der "Brühe" fischen (state=309, param=50→60) |
+| Arkane Splitter-Höhle | Arkane Splitter als Loot (state=322) |
+| Schlüsselmeister-Shop | Segen gegen Schlüssel tauschen (state=315) |
+| Key to Failure Shop | Schlüssel gegen Flüche tauschen (state=323) |
+| Lavaraum | 10% Schaden |
+| Wasserraum | Ertrinken nach 10 Sekunden |
+| Erzähler-Raum | 25% Heilung + Segen |
+| Sarkophag | Gold (episches Item mit Schlüssel) |
+| Schere-Stein-Papier | Segen + episches Item bei Gewinn (state=308) |
+| Glücksrad | Segen, Fluch, Gold oder Schlüssel |
+| Kanalraum | Episches Item |
+| Lebensbrunnen | 25% Heilung (state=301) |
+| Spinne | 1/2/5 Schlüssel |
+| Wunschbrunnen | Gold → episches Item oder Segen |
+| Zeughaus (Räume 90–98) | Episches Item; 10% Chance legendär bei 2 Waffen |
+
+---
+
 ## Schicksalsklunker (Gems of Fate)
 
-Nach jedem besiegten Boss (Räume 25, 50, 75, 100) wählt man einen von drei Klunkern.  
+Nach jedem besiegten Boss (Räume 25, 50, 75, 100) **muss** man einen von drei Klunkern wählen – man kann den Raum nicht ohne Auswahl verlassen.  
 Tier-Liste und Beschreibungen aus ldgadget.12hp.de + Spieler-Screenshots.
 
 | Tier | Name (DE) | Name (EN) | Effekt + | Effekt – |
@@ -248,38 +284,21 @@ Tier-Liste und Beschreibungen aus ldgadget.12hp.de + Spieler-Screenshots.
 | C | Diamant des Zeitreisenden | Diamond of the Time Traveler | Segen-Dauer verlängert | Fässer enthalten immer Flüche |
 | C | Hoffnung des Verdurstenden | Hope of the Thirsty One | Mehr verfluchte Türen | – |
 | C | Verfluchte Perle | Cursed Pearl | – | – |
-| C | Blutstropfen der Opfergabe | Blood Drop of Sacrifice | Weniger Schaden durch Opfertüren; mehr Opfertüren | – |
+| C | Blutstropfen der Opfergabe | Blood Drop of Sacrifice | Weniger Schaden durch Opfertøren; mehr Opfertøren | – |
 | D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Türen |
 | E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Türen | – |
 | E | Kronjuwel des Teufels | Crown Jewel of the Devil | Chance auf epische Türen | Hinter Türen können sich Monster verbergen |
-| F | Kiesel der Hinterlist | Pebble of Deceit | Monster verursachen weniger Schaden | Hinter Türen können sich Monster verbergen |
-| F | Magnetstein | Lodestone | Chance auf doppelt verschlossene Türen; erhöhte Schlüsselchance aus Kämpfen | – |
+| F | Findling des Tölpels | ? | Weniger Opfertøren | +30% Schaden bei gescheitertem Fluchtversuch |
+| F | Kiesel der Hinterlist | Pebble of Deceit | Monster verursachen weniger Schaden | Hinter Tøren können sich Monster verbergen |
+| F | Magnetstein | Lodestone | Chance auf doppelt verschlossene Tøren; erhöhte Schlüsselchance aus Kämpfen | – |
 | F | Auge des Stiers | Eye of the Bull | – | – |
-| F | Irrender Brocken des Tölpels | Erratic Boulder of the Hick | Weniger Opfertüren | – |
-| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen auch hinter verschlossenen Türen | – |
-| F | Alter Opferstein | Old Sacrifice Stone | Weniger Schaden durch Opfertruhen; Opfertruhen auch hinter verschlossenen Türen | – |
+| F | Irrender Brocken des Tölpels | Erratic Boulder of the Hick | Weniger Opfertøren | – |
+| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen auch hinter verschlossenen Tøren | – |
+| F | Alter Opferstein | Old Sacrifice Stone | Weniger Schaden durch Opfertruhen; Opfertruhen auch hinter verschlossenen Tøren | – |
 
 ---
 
-## Sonderbereiche
-
-| Raum | Inhalt |
-|------|--------|
-| Schlüsselmeister-Shop | Segen gegen Schlüssel tauschen |
-| Key to Failure Shop | Schlüssel gegen Flüche tauschen |
-| Lavaraum | 10% Schaden |
-| Wasserraum | Ertrinken nach 10 Sekunden |
-| Erzähler-Raum | 25% Heilung + Segen |
-| Sarkophag | Gold (episches Item mit Schlüssel) |
-| Schere-Stein-Papier | Segen + episches Item bei Gewinn |
-| Glücksrad | Segen, Fluch, Gold oder Schlüssel |
-| Kanalraum | Episches Item |
-| Lebensbrunnen | 25% Heilung |
-| Spinne | 1/2/5 Schlüssel |
-| Wunschbrunnen | Gold → episches Item oder Segen |
-| Zeughaus (Räume 90–98) | Episches Item; 10% chance legendär bei 2 Waffen |
-
-### Monster-Schadenstabelle (% der max. LD-HP)
+## Monster-Schadenstabelle (% der max. LD-HP)
 
 | Bereich | Min | Avg | Max |
 |---------|-----|-----|-----|
@@ -296,22 +315,23 @@ Tier-Liste und Beschreibungen aus ldgadget.12hp.de + Spieler-Screenshots.
 
 ## Noch zu erforschen
 
-- [ ] Schicksalstør / Glücksrad (param=?)
+- [ ] Schicksalstør / Glücksrad (param=?, state=?)
 - [ ] Hungrige Tür füttern (param=?)
 - [ ] Segenstür (param=?)
-- [ ] Gem-Auswahl nach Boss (welcher param?)
-- [ ] Restliche 1000er state-Werte (1010, 1014, 1015, 1016)
+- [ ] Restliche 1000er state-Werte (1010, 1013, 1014, 1015, 1016)
 - [ ] SSP: param før Stein und Papier bestätigen
 - [ ] iadungeonsave Felder [4]–[16], [18], [20]–[21], [23]–[50]
 - [ ] Dungeon-Typ Feld [1]: 2=normal, 3=LD Ultimate?
-- [ ] Bosse 2–4 komplett mit Klunker-Auswahl-Request
 - [ ] Legendäre Truhe nach Endboss (Raum 100)
 - [ ] Zeughaus (state=?, Räume 90–98)
+- [ ] buff_id=1 genauer klären (Plünderer vs. Weg der Besserung)
+- [ ] state=322 genauer kartieren (verschiedene Raumtypen?)
+- [ ] Findling des Tölpels: EN-Name bestätigen, Tier überprüfen
 
 ---
 
 ## Quellen
 
-- HAR-Aufzeichnungen: 12 Charakter-Runs auf verschiedenen Servern (F9, F25)
+- HAR-Aufzeichnungen: 18 Charakter-Runs auf verschiedenen Servern (F9, F25)
 - Playa Games Helpshift: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/57-legendary-dungeon/
 - ldgadget.12hp.de: https://ldgadget.12hp.de
