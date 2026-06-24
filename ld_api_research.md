@@ -1,7 +1,7 @@
 # Legendary Dungeon – API Research
 
-> Status: **Work in Progress** – basierend auf 37 Charakter-Runs (Räume 1–100)  
-> Fehlend: Legendäre Truhe nach Endboss, einige Sonderfälle
+> Status: **Work in Progress** – basierend auf 70+ Charakter-Runs (Räume 1–100)  
+> Fehlend: Einige Sonderfälle, Segenstür param
 
 ---
 
@@ -27,19 +27,20 @@ GET https://f{server}.sfgame.net/cmd.php?req=IADungeonInteract&params={base64}&s
 | `6` | Fass / Holzkiste öffnen (ohne Schlüssel) | Interaktionsraum |
 | `20` | Kampf starten / Skelett bekämpfen | Kampf |
 | `21` | Fliehen | Kampf / Schmatztruhe |
-| `40` | Tür mit Schlüssel öffnen / Truhe/Kiste bestätigen | Interaktion |
+| `40` | Tür mit Schlüssel / Hungrige Tür öffnen / Truhe bestätigen | Interaktion |
 | `42` | Raum verlassen ohne Aktion (Truhe nicht öffnen) | Abbruch |
 | `50` | Falle / Opfertür / erleuchteten Durchgang / Jungbrunnen / Goldenen Raum betreten | Navigation |
 | `51` | Raum verlassen ohne Aktion (Händler ablehnen) | Abbruch |
 | `60` | Kampfergebnis / Raum-Aktion bestätigen | Kampf / Interaktion |
 | `70` | Poll / Zustand abfragen / nächster Schritt / Kauf bestätigen | Allgemein |
 | `80` | Händler: in Waren blättern (kostet 1 Pilz) | Händler |
+| `90` | Schere-Stein-Papier: Stein wählen | SSP-Raum |
 | `91` | Schere-Stein-Papier: Papier? (unbestätigt) | SSP-Raum |
 | `92` | Schere-Stein-Papier: Schere wählen | SSP-Raum |
-| `93` | Schere-Stein-Papier: Stein? (unbestätigt) | SSP-Raum |
 
 > **Hinweis:** Händler-Käufe und Klunker-Auswahl nach Boss erfolgen über `param=70` – kein eigener param!  
-> **Noch unbekannt:** param für hungrige Tür füttern, Segenstür
+> **Hungrige Tür:** `param=40` zum Bezahlen/Öffnen, danach steht Satte Kiste (monster=603) dahinter.  
+> **Noch unbekannt:** param für Segenstør
 
 ---
 
@@ -71,7 +72,7 @@ Format: `iadungeonstats:{a}/{b}/{c}/{d}/{e}`
 | `[1]` | Anzahl Bosse besiegt |
 | `[2]` | Anzahl Monster getötet |
 | `[3]` | Gold gesammelt |
-| `[4]` | ? (meist 3–5) |
+| `[4]` | ? (meist 1–7) |
 
 ---
 
@@ -90,16 +91,17 @@ Format: `iadungeonstats:{a}/{b}/{c}/{d}/{e}`
 | `200` | Leerer Durchgang / Tür ohne Inhalt (kann Falle enthalten) |
 | `301` | Jungbrunnen (HP-Heilung) |
 | `303` | Goldene Tür → Steinhaufen (Steine für Festung) |
-| `304` | Goldene Tør → Lavaraum (HP-Verlust beim Betreten) |
+| `304` | Goldene Tür → Lavaraum (HP-Verlust beim Betreten) |
 | `305` | Goldene Tür → Dungeon-Erzähler (Tee trinken = HP + Segen) |
+| `306` | Goldene Tür → leerer Raum (kein Effekt) |
 | `307` | Goldene Tür → Wunschbrunnen (Gold → Item oder Segen) |
 | `308` | Schere-Stein-Papier-Raum |
 | `309` | Goldene Tür (allgemein) |
 | `310` | Erleuchteter/Goldener Durchgang |
 | `314` | Goldene Tür → Ressourcenraum (Holzstapel, etc.) |
-| `315` | Schlüsselmeister-Händler / Kostenloser Händler (Ebene 1) |
+| `315` | Schlüsselmeister-Händler (Segen, Lebenselixiere, etc.) |
 | `316` | Goldene Tür → Schatztruhe (Silberne o.ä.) |
-| `317` | Schicksalstør / Glücksrad (zufällige Belohnung, kein Schlüssel nötig) |
+| `317` | Schicksalstür / Glücksrad (zufällige Belohnung, kein Schlüssel nötig) |
 | `321` | Goldene Tür → Seelenbad (Seelen für die Unterwelt) |
 | `322` | Spezialraum ohne Kampf (Arkane Splitter-Höhle, leerer Raum, etc.) |
 | `323` | Fluchhändler-Raum |
@@ -113,6 +115,10 @@ Post-state: `1015`
 Eine Tür hinter der das Glücksrad gedreht wird. Zufällige Belohnung (Segen, Gold, Fluch, etc.).  
 Dahinter: leerer Raum, Monster-Raum oder Interaktionsraum.
 
+### Schlüsselmeister-Händler (state=315)
+Verkauft Segen, Lebenselixiere (25% oder 50% HP) und weitere Items gegen Schlüssel oder Pilze.  
+**Kein Fluchhändler** – Flüche verkauft nur der Fluchhändler (state=323, Scheibenkleistermeister).
+
 ### Post-Raum-Zustände (nach Abschluss eines Raums)
 
 | state | Bedeutung |
@@ -121,14 +127,14 @@ Dahinter: leerer Raum, Monster-Raum oder Interaktionsraum.
 | `1001` | Normaler Abschluss (nächster Raum wählbar) |
 | `1002` | Auswahl/Bestätigung (Item eingepackt, Klunker gewählt, Gold, etc.) |
 | `1003` | Boss besiegt + Klunker gewählt (Variante) |
-| `1006` | Notausgang-Truhe geöffnet / Boss besiegt ohne Klunker |
-| `1007` | Gold erhalten (Skelett zu Staub / Bronzene Schatztruhe) |
+| `1006` | Notausgang-Truhe geöffnet / Raum verlassen (allgemein) |
+| `1007` | Gold erhalten (Skelett zu Staub / Bronzene Schatztruhe / Holzkiste) |
 | `1008` | Segen erhalten (nach Raum, z.B. Weg der Besserung aus Fass) |
 | `1009` | Fluch erhalten (aus Tür/Händler/Fass) |
 | `1010` | Schlüssel erhalten nach Kampf |
-| `1011` | Fluch aus Fass erhalten |
+| `1011` | Fluch aus Fass erhalten / Gold aus Kiste (Kontext-abhängig) |
 | `1012` | Schaden durch aktiven Fluch (HP sinkt pro Raum) |
-| `1013` | ? (selten nach Boss) |
+| `1013` | Gold erhalten (aus Schatztruhe) |
 | `1014` | Gold + Segen erhalten |
 | `1015` | Zugemauerte Tür angeklickt (kein Durchgang) |
 | `1016` | Fluch nach Kampf erhalten (Kaputte Rüstung o.ä.) |
@@ -155,11 +161,11 @@ Gilt wenn `state=100` (Interaktionsraum).
 | `0` | Bronzene Schatztruhe |
 | `1` | Silberne Schatztruhe |
 | `2` | Epische Schatztruhe |
-| `500` | Gefräßige Schmatztruhe (verwandelt sich in Monster) |
+| `500` | GefrǤߚige Schmatztruhe (verwandelt sich in Monster) |
 | `600` | Opfertruhe |
 | `601` | Verfluchte Truhe |
 | `602` | Notausgang-Preis-Truhe |
-| `603` | Satte Kiste (hinter hungriger Tür) |
+| `603` | Satte Kiste (hinter Hungriger Tür) |
 
 ### Kisten & Fässer
 
@@ -181,6 +187,7 @@ Gilt wenn `state=100` (Interaktionsraum).
 
 | monster | Bedeutung |
 |---------|-----------|
+| `90` | SSP-Gegner (Gleichstand = Stein) |
 | `92` | SSP-Gegner (Gleichstand = Schere) |
 
 ### Monster-Räume (state=1/2/3/4/5)
@@ -209,7 +216,7 @@ Negative Werte = reguläre Monster-IDs.
 Erscheint beim Tod oder nach bestimmten Räumen (z.B. Zeughaus).  
 Format: `iamap:{boss_raum}/{boss_monster_id}/{?}/{gem_typ}/...`
 
-Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/...`
+Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/1/-315`
 
 - Zeigt alle 4 Bosse mit Raumnummer, Monster-ID und gewähltem/nicht gewähltem Klunker
 - `315` = Klunker gewählt / `-315` = kein Klunker gewählt
@@ -239,7 +246,7 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/...`
 | `2` | Segen | One Hit Wonder (Monster sofort töten) |
 | `4` | Segen? | ? |
 | `5` | Segen | Dietrich (nächste 4 Tøren ohne Schlüssel öffnen) |
-| `6` | Segen | Schlüsselerlebnis (70% Chance auf 2 Schløssel in 8 Kämpfen) |
+| `6` | Segen | Schlüsselerlebnis (70% Chance auf 2 Schlüssel in 8 Kämpfen) |
 | `8` | Segen | Weg der Besserung (HP-Heilung nach Raum) |
 | `101` | Fluch | Kaputte Rüstung (Gegner verursacht +50% Schaden für 4/8 Räume) |
 | `102` | Fluch | 5% Schaden pro Raum für 5 Räume |
@@ -266,9 +273,19 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/...`
 
 ---
 
+## Hungrige Tür
+
+- Verlangt eine Ressource als Eintrittspreis (Arkane Splitter, Sanduhren, Seelen, Steine, etc.)
+- Bezahlen: `param=40`
+- Dahinter immer eine Satte Kiste (monster=`603`)
+- Satte Kiste enthält Ressourcen (Seelen, Holz, Arkane Splitter, etc.)
+- Kein Schlüssel nötig
+
+---
+
 ## Goldene Räume
 
-Goldene Räume erscheinen hinter goldenen Tøren (state=309 allgemein).
+Goldene Räume erscheinen hinter goldenen Türen (state=309 allgemein).
 
 | state | Raumtyp | Inhalt |
 |-------|---------|--------|
@@ -276,12 +293,13 @@ Goldene Räume erscheinen hinter goldenen Tøren (state=309 allgemein).
 | `303` | Steinhaufen | Steine für Festung |
 | `304` | Lavaraum | HP-Verlust beim Betreten |
 | `305` | Dungeon-Erzähler | Tee trinken: HP + Segen; ablehnen: kein Effekt |
+| `306` | Leerer goldener Raum | Kein Effekt |
 | `307` | Wunschbrunnen | Gold → Item oder Segen |
 | `308` | Schere-Stein-Papier | Segen + Item bei Gewinn; Fluch + 10% Schaden bei Verlust |
 | `309` | Goldene Tür (allgemein) | Kanalisation, Sarkophag, Spinne, etc. |
 | `310` | Erleuchteter Durchgang | Monster mit Laterne dahinter |
 | `314` | Holzstapel / Ressourcenraum | Holz, Stein, Metall, etc. |
-| `315` | Schlüsselmeister-Shop | Segen gegen Schlüssel |
+| `315` | Schlüsselmeister-Shop | Segen, Lebenselixiere gegen Schlüssel/Pilze |
 | `316` | Schatztruhe | Silberne Schatztruhe o.ä. |
 | `321` | Seelenbad | Seelen für die Unterwelt |
 | `322` | Arkane Splitter-Höhle / leer | Arkane Splitter oder leer |
@@ -292,32 +310,32 @@ Goldene Räume erscheinen hinter goldenen Tøren (state=309 allgemein).
 
 ## Schicksalsklunker (Gems of Fate)
 
-Nach den Bossen in Räumen 25, 50 und 75 **muss** man einen von drei Klunkern'wählen. Nach dem Endboss (Raum 100) gibt es stattdessen eine legendäre Truhe – kein Klunker.  
+Nach den Bossen in Räumen 25, 50 und 75 **muss** man einen von drei Klunkern wählen. Nach dem Endboss (Raum 100) gibt es stattdessen eine legendäre Truhe – kein Klunker.  
 Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 
 | Tier | Name (DE) | Name (EN) | Effekt + | Effekt – |
 |------|-----------|-----------|----------|----------|
 | S | Seele des Hasen | Soul of the Rabbit | +40% Fluchtchance | Monster +25% Schaden |
 | A | Verfluchter Mondstein | Cursed Moonstone | +20% Fluchtchance | Fluch-Dauer +1 |
-| A | Spionageklunker | Spying Gem | Chance auf unverschlossene Tøren | -15% Schlüssel aus Kämpfen |
-| A | Anhänger des Schløsselmeisters | Pendant of the Key Master | 40% Chance nach Fliehen: Schlüssel | Eine Tür immer verschlossen |
+| A | Spionageklunker | Spying Gem | Chance auf unverschlossene Türen | -15% Schlüssel aus Kämpfen |
+| A | Anhänger des Schlüsselmeisters | Pendant of the Key Master | 40% Chance nach Fliehen: Schlüssel | Eine Tür immer verschlossen |
 | B | Schmieriger Heilstein | Greasy Healing Stone | Nach Tod: Weg der Besserung 3R | Keine epischen Truhen |
 | B | Glücksspielerbrocken | Boulder of the Gambler | Fallen → Flüche; +50% Segen aus Fässern | – |
-| B | Brocken der Gier | Boulder of Greed | Mehr geheimnisvolle Tøren; +Segen aus Truhen | – |
+| B | Brocken der Gier | Boulder of Greed | Mehr geheimnisvolle Türen; +Segen aus Truhen | – |
 | C | Schatz des Helden | Treasure of the Hero | Monster weniger Schaden | -Chance auf Items |
 | C | Diamant des Zeitreisenden | Diamond of the Time Traveler | Segen-Dauer verlängert | Fässer → immer Flüche |
-| C | Hoffnung des Verdurstenden | Hope of the Thirsty One | Mehr verfluchte Tøren | – |
+| C | Hoffnung des Verdurstenden | Hope of the Thirsty One | Mehr verfluchte Türen | – |
 | C | Verfluchte Perle | Cursed Pearl | – | – |
-| C | Blutstropfen der Opfergabe | Blood Drop of Sacrifice | Weniger Schaden durch Opfertøren | – |
-| D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Tøren |
-| E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Tøren | – |
-| E | Kronjuwel des Teufels | Crown Jewel of the Devil | Chance auf epische Tøren | Monster hinter Tøren |
-| F | Findling des Tölpels | ? | Weniger Opfertøren | +30% Schaden bei Flucht-Fail |
-| F | Kiesel der Hinterlist | Pebble of Deceit | Monster weniger Schaden | Monster hinter Tøren |
-| F | Magnetstein | Lodestone | Doppelt verschlossene Tøren; +Schlüssel | – |
+| C | Blutstropfen der Opfergabe | Blood Drop of Sacrifice | Weniger Schaden durch Opfertüren | – |
+| D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Türen |
+| E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Türen | – |
+| E | Kronjuwel des Teufels | Crown Jewel of the Devil | Chance auf epische Türen | Monster hinter Türen |
+| F | Findling des Tölpels | ? | Weniger Opfertüren | +30% Schaden bei Flucht-Fail |
+| F | Kiesel der Hinterlist | Pebble of Deceit | Monster weniger Schaden | Monster hinter Türen |
+| F | Magnetstein | Lodestone | Doppelt verschlossene Türen; +Schlüssel | – |
 | F | Auge des Stiers | Eye of the Bull | – | – |
-| F | Irrender Brocken des Tölpels | Erratic Boulder of the Hick | Weniger Opfertøren | – |
-| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen hinter Tøren | – |
+| F | Irrender Brocken des Tölpels | Erratic Boulder of the Hick | Weniger Opfertüren | – |
+| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen hinter Türen | – |
 | F | Alter Opferstein | Old Sacrifice Stone | Weniger Schaden Opfertruhen | – |
 
 ---
@@ -340,14 +358,12 @@ Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 ## Noch zu erforschen
 
 - [x] Legendäre Truhe nach Endboss: Run endet nach Item einpacken, kein Post-state, direkt Auswahlbildschirm
-- [ ] Hungrige Tür füttern (param=?)
+- [x] Hungrige Tür: `param=40`, akzeptiert Arkane Splitter / Sanduhren / Seelen / Steine
+- [x] SSP: `param=90` = Stein, `param=92` = Schere (Papier noch unbestätigt)
 - [ ] Segenstür (param=?)
-- [ ] SSP: param für Stein und Papier bestätigen
 - [ ] iadungeonsave Felder [4]–[16], [18], [20]–[21], [23]–[50]
 - [ ] Dungeon-Typ Feld [1]: 2=normal, 3=LD Ultimate?
-- [ ] state=303/304/305/307 mit mehr Runs bestätigen
 - [ ] buff_id=1 genauer klären (Plünderer vs. Weg der Besserung)
-- [ ] state=1013 genaue Bedeutung
 - [ ] Boss-Varianten A/B vollständig kartieren
 - [ ] Sarkophag, Spinne, Kanalraum, Wasserraum state-Werte
 
@@ -355,6 +371,6 @@ Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 
 ## Quellen
 
-- HAR-Aufzeichnungen: 60+ Charakter-Runs auf verschiedenen Servern (F9, F25, F28)
+- HAR-Aufzeichnungen: 70+ Charakter-Runs auf verschiedenen Servern (F9, F25, F28)
 - Playa Games Helpshift: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/57-legendary-dungeon/
 - ldgadget.12hp.de: https://ldgadget.12hp.de
