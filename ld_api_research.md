@@ -94,10 +94,11 @@ Format: `iadungeonstats:{a}/{b}/{c}/{d}/{e}`
 | `304` | Goldene Tür → Lavaraum (HP-Verlust beim Betreten) |
 | `305` | Goldene Tür → Dungeon-Erzähler (Tee trinken = HP + Segen) |
 | `306` | Goldene Tür → leerer Raum (kein Effekt) |
-| `307` | Goldene Tür → Wunschbrunnen (Gold → Item oder Segen) |
+| `307` | Goldene Tür → Wunschbrunnen (Münze einwerfen → Item oder Segen; kein Auswahlfeld) |
 | `308` | Schere-Stein-Papier-Raum |
 | `309` | Goldene Tür (allgemein) |
 | `310` | Erleuchteter/Goldener Durchgang |
+| `312` | Goldene Tür → Sarkophag (Gold) |
 | `314` | Goldene Tür → Ressourcenraum (Holzstapel, etc.) |
 | `315` | Schlüsselmeister-Händler (Segen, Lebenselixiere, etc.) |
 | `316` | Goldene Tür → Schatztruhe (Silberne o.ä.) |
@@ -111,7 +112,7 @@ Format: `iadungeonstats:{a}/{b}/{c}/{d}/{e}`
 Blockiert den Weg. Kein Durchgang möglich, nur zum Anklicken.  
 Post-state: `1015`
 
-### Schicksalstør (Glücksrad)
+### Schicksalstür (Glücksrad)
 Eine Tür hinter der das Glücksrad gedreht wird. Zufällige Belohnung (Segen, Gold, Fluch, etc.).  
 Dahinter: leerer Raum, Monster-Raum oder Interaktionsraum.
 
@@ -161,7 +162,7 @@ Gilt wenn `state=100` (Interaktionsraum).
 | `0` | Bronzene Schatztruhe |
 | `1` | Silberne Schatztruhe |
 | `2` | Epische Schatztruhe |
-| `500` | GefrǤߚige Schmatztruhe (verwandelt sich in Monster) |
+| `500` | Gefräßige Schmatztruhe (verwandelt sich in Monster) |
 | `600` | Opfertruhe |
 | `601` | Verfluchte Truhe |
 | `602` | Notausgang-Preis-Truhe |
@@ -245,12 +246,13 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/1/-315`
 | `1` | Segen | Plünderer (+100% Gold in 10 Kammern) oder Weg der Besserung |
 | `2` | Segen | One Hit Wonder (Monster sofort töten) |
 | `4` | Segen? | ? |
-| `5` | Segen | Dietrich (nächste 4 Tøren ohne Schlüssel öffnen) |
+| `5` | Segen | Dietrich (nächste 4 Türen ohne Schlüssel öffnen) |
 | `6` | Segen | Schlüsselerlebnis (70% Chance auf 2 Schlüssel in 8 Kämpfen) |
 | `8` | Segen | Weg der Besserung (HP-Heilung nach Raum) |
 | `101` | Fluch | Kaputte Rüstung (Gegner verursacht +50% Schaden für 4/8 Räume) |
 | `102` | Fluch | 5% Schaden pro Raum für 5 Räume |
 | `104` | Fluch | 50% Gold aus Truhen für 5/10 Kammern |
+| `105` | Fluch | Starke Verschlüsselung (doppelte Schlüsselkosten für 4/8 Türen) |
 
 ---
 
@@ -260,7 +262,7 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/1/-315`
 - Erscheint maximal einmal pro Dungeon-Run, nie in Ebene 1
 - Kein Schlüssel erforderlich
 - Dahinter immer ein Monster-Raum (state=2 oder 3)
-- Nach Sieg: Wahl zwischen weiterer Prøfungspforte oder Notausgang
+- Nach Sieg: Wahl zwischen weiterer Prüfungspforte oder Notausgang
 - Maximal 5 Prüfungspforten hintereinander
 - Post-states: `1019` → `1020` → `1021` → `1022` → `1023`
 
@@ -294,9 +296,10 @@ Goldene Räume erscheinen hinter goldenen Türen (state=309 allgemein).
 | `304` | Lavaraum | HP-Verlust beim Betreten |
 | `305` | Dungeon-Erzähler | Tee trinken: HP + Segen; ablehnen: kein Effekt |
 | `306` | Leerer goldener Raum | Kein Effekt |
-| `307` | Wunschbrunnen | Gold → Item oder Segen |
+| `307` | Wunschbrunnen | Münze einwerfen → Item oder Segen; kein Auswahlfeld |
 | `308` | Schere-Stein-Papier | Segen + Item bei Gewinn; Fluch + 10% Schaden bei Verlust |
-| `309` | Goldene Tür (allgemein) | Kanalisation, Sarkophag, Spinne, etc. |
+| `309` | Goldene Tür (allgemein) | Kanalisation, Spinne, etc. |
+| `312` | Sarkophag | Gold erhalten |
 | `310` | Erleuchteter Durchgang | Monster mit Laterne dahinter |
 | `314` | Holzstapel / Ressourcenraum | Holz, Stein, Metall, etc. |
 | `315` | Schlüsselmeister-Shop | Segen, Lebenselixiere gegen Schlüssel/Pilze |
@@ -330,12 +333,12 @@ Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 | D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Türen |
 | E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Türen | – |
 | E | Kronjuwel des Teufels | Crown Jewel of the Devil | Chance auf epische Türen | Monster hinter Türen |
-| F | Findling des Tölpels | ? | Weniger Opfertüren | +30% Schaden bei Flucht-Fail |
+| F | Findling des Tölpels | ? | Weniger Opfertøren | +30% Schaden bei Flucht-Fail |
 | F | Kiesel der Hinterlist | Pebble of Deceit | Monster weniger Schaden | Monster hinter Türen |
 | F | Magnetstein | Lodestone | Doppelt verschlossene Türen; +Schlüssel | – |
 | F | Auge des Stiers | Eye of the Bull | – | – |
-| F | Irrender Brocken des Tölpels | Erratic Boulder of the Hick | Weniger Opfertüren | – |
-| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen hinter Türen | – |
+| F | Irrender Brocken des Tölpels | Erratic Boulder of the Hick | Weniger Opfertøren | – |
+| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen hinter Tøren | – |
 | F | Alter Opferstein | Old Sacrifice Stone | Weniger Schaden Opfertruhen | – |
 
 ---
@@ -360,17 +363,18 @@ Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 - [x] Legendäre Truhe nach Endboss: Run endet nach Item einpacken, kein Post-state, direkt Auswahlbildschirm
 - [x] Hungrige Tür: `param=40`, akzeptiert Arkane Splitter / Sanduhren / Seelen / Steine
 - [x] SSP: `param=90` = Stein, `param=92` = Schere (Papier noch unbestätigt)
+- [x] Sarkophag: state=312 (Gold)
 - [ ] Segenstür (param=?)
 - [ ] iadungeonsave Felder [4]–[16], [18], [20]–[21], [23]–[50]
 - [ ] Dungeon-Typ Feld [1]: 2=normal, 3=LD Ultimate?
-- [ ] buff_id=1 genauer klären (Plünderer vs. Weg der Besserung)
+- [ ] buff_id=1 genauer klären (Plønderer vs. Weg der Besserung)
 - [ ] Boss-Varianten A/B vollständig kartieren
-- [ ] Sarkophag, Spinne, Kanalraum, Wasserraum state-Werte
+- [ ] Spinne, Kanalraum, Wasserraum state-Werte
 
 ---
 
 ## Quellen
 
-- HAR-Aufzeichnungen: 70+ Charakter-Runs auf verschiedenen Servern (F9, F25, F28)
+- HAR-Aufzeichnungen: 80+ Charakter-Runs auf verschiedenen Servern (F9, F25, F28)
 - Playa Games Helpshift: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/57-legendary-dungeon/
 - ldgadget.12hp.de: https://ldgadget.12hp.de
