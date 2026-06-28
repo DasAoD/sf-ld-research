@@ -51,7 +51,7 @@ Format: `iadungeon.iadungeonsave:{f0}/{f1}/{f2}/...`
 | Index | Bedeutung | Beispielwert |
 |-------|-----------|--------------|
 | `[0]` | Charakter-ID (konstant) | `664444180` |
-| `[1]` | Dungeon-Typ (0=normal, ?=Ultimate) | `0` |
+| `[1]` | Dungeon-Typ / Run-Nummer (0=1. Run normal, 1=2. Run normal, 2=1. Run Ultimate) | `0` |
 | `[2]` | Aktuelle HP | `82426523` |
 | `[3]` | Maximale HP | `139762968` |
 | `[17]` | Aktuelle Raumnummer | `8` |
@@ -118,7 +118,7 @@ Dahinter: leerer Raum, Monster-Raum oder Interaktionsraum.
 
 ### Schlüsselmeister-Händler (state=315)
 Verkauft Segen, Lebenselixiere (25% oder 50% HP) und weitere Items gegen Schlüssel oder Pilze.  
-**Kein Fluchhändler** – Flüche verkauft nur der Fluchhändler (state=323, Scheibenkleistermeister).
+**Kein Fluchhändler** – Flüche verkauft nur der Fluci�ändler (state=323, Scheibenkleistermeister).
 
 ### Post-Raum-Zustände (nach Abschluss eines Raums)
 
@@ -128,11 +128,12 @@ Verkauft Segen, Lebenselixiere (25% oder 50% HP) und weitere Items gegen Schlüs
 | `1001` | Normaler Abschluss (nächster Raum wählbar) |
 | `1002` | Auswahl/Bestätigung (Item eingepackt, Klunker gewählt, Gold, etc.) |
 | `1003` | Boss besiegt + Klunker gewählt (Variante) |
+| `1005` | Schlüssel nach Monsterkampf erhalten |
 | `1006` | Notausgang-Truhe geöffnet / Raum verlassen (allgemein) |
 | `1007` | Gold erhalten (Skelett zu Staub / Bronzene Schatztruhe / Holzkiste) |
 | `1008` | Segen erhalten (nach Raum, z.B. Weg der Besserung aus Fass) |
 | `1009` | Fluch erhalten (aus Tür/Händler/Fass) |
-| `1010` | Schlüssel erhalten nach Kampf |
+| `1010` | Item erhalten (aus Interaktionsraum / goldener Tür, z.B. Kanalisation, Zeughaus) |
 | `1011` | Fluch aus Fass erhalten / Gold aus Kiste (Kontext-abhängig) |
 | `1012` | Schaden durch aktiven Fluch (HP sinkt pro Raum) |
 | `1013` | Gold erhalten (aus Schatztruhe) |
@@ -367,7 +368,7 @@ Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 - [x] Sarkophag: state=312 (Gold)
 - [ ] Segenstür (param=?)
 - [ ] iadungeonsave Felder [4]–[16], [18], [20]–[21], [23]–[50]
-- [ ] Dungeon-Typ Feld [1]: 0=normal, ?=LD Ultimate (Hypothese: 1 oder 3)
+- [x] Dungeon-Typ Feld [1]: 0=1. Run normal, 1=2. Run normal, 2=1. Run Ultimate (3=2. Run Ultimate, noch nicht gesehen)
 - [ ] buff_id=1 genauer klären (Plønderer vs. Weg der Besserung)
 - [ ] Boss-Varianten A/B vollständig kartieren
 - [ ] Spinne, Kanalraum, Wasserraum state-Werte
