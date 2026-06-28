@@ -35,7 +35,7 @@ GET https://f{server}.sfgame.net/cmd.php?req=IADungeonInteract&params={base64}&s
 | `70` | Poll / Zustand abfragen / nächster Schritt / Kauf bestätigen | Allgemein |
 | `80` | Händler: in Waren blättern (kostet 1 Pilz) | Händler |
 | `90` | Schere-Stein-Papier: Stein wählen | SSP-Raum |
-| `91` | Schere-Stein-Papier: Papier? (unbestätigt) | SSP-Raum |
+| `91` | Schere-Stein-Papier: Papier wählen | SSP-Raum |
 | `92` | Schere-Stein-Papier: Schere wählen | SSP-Raum |
 
 > **Hinweis:** Händler-Käufe und Klunker-Auswahl nach Boss erfolgen über `param=70` – kein eigener param!  
@@ -51,14 +51,14 @@ Format: `iadungeon.iadungeonsave:{f0}/{f1}/{f2}/...`
 | Index | Bedeutung | Beispielwert |
 |-------|-----------|--------------|
 | `[0]` | Charakter-ID (konstant) | `664444180` |
-| `[1]` | Dungeon-Typ (2=normal, 3=Ultimate?) | `2` |
+| `[1]` | Dungeon-Typ (0=normal, ?=Ultimate) | `0` |
 | `[2]` | Aktuelle HP | `82426523` |
 | `[3]` | Maximale HP | `139762968` |
 | `[17]` | Aktuelle Raumnummer | `8` |
 | `[19]` | Raumzustand (state) | `100` |
 | `[22]` | Objekt/Monster im Raum | `-5085` |
 
-> **Noch unbekannt:** viele andere Felder (Schlüssel-Anzahl, aktive Segen/Flüche, Ressourcen, etc.)
+> **Noch unbekannt:** viele andere Felder (Schlüssel-Anzahl, aktive Segen/Flýche, Ressourcen, etc.)
 
 ---
 
@@ -72,13 +72,13 @@ Format: `iadungeonstats:{a}/{b}/{c}/{d}/{e}`
 | `[1]` | Anzahl Bosse besiegt |
 | `[2]` | Anzahl Monster getötet |
 | `[3]` | Gold gesammelt |
-| `[4]` | ? (meist 1–7) |
+| `[4]` | ? (meist 1-7) |
 
 ---
 
 ## Response: state-Werte (Raumzustände)
 
-### Aktive Raumzustände
+### Aktive Raoumzustände
 
 | state | Bedeutung |
 |-------|-----------|
@@ -91,7 +91,7 @@ Format: `iadungeonstats:{a}/{b}/{c}/{d}/{e}`
 | `200` | Leerer Durchgang / Tür ohne Inhalt (kann Falle enthalten) |
 | `301` | Jungbrunnen (HP-Heilung) |
 | `303` | Goldene Tür → Steinhaufen (Steine für Festung) |
-| `304` | Goldene Tür → Lavaraum (HP-Verlust beim Betreten) |
+| `304` | Goldene Tür → Lavaraum (HP-VerFgust beim Betreten) |
 | `305` | Goldene Tür → Dungeon-Erzähler (Tee trinken = HP + Segen) |
 | `306` | Goldene Tür → leerer Raum (kein Effekt) |
 | `307` | Goldene Tür → Wunschbrunnen (Münze einwerfen → Item oder Segen; kein Auswahlfeld) |
@@ -189,6 +189,7 @@ Gilt wenn `state=100` (Interaktionsraum).
 | monster | Bedeutung |
 |---------|-----------|
 | `90` | SSP-Gegner (Gleichstand = Stein) |
+| `91` | SSP-Gegner (Gleichstand = Papier) |
 | `92` | SSP-Gegner (Gleichstand = Schere) |
 
 ### Monster-Räume (state=1/2/3/4/5)
@@ -326,12 +327,12 @@ Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 | B | Glücksspielerbrocken | Boulder of the Gambler | Fallen → Flüche; +50% Segen aus Fässern | – |
 | B | Brocken der Gier | Boulder of Greed | Mehr geheimnisvolle Türen; +Segen aus Truhen | – |
 | C | Schatz des Helden | Treasure of the Hero | Monster weniger Schaden | -Chance auf Items |
-| C | Diamant des Zeitreisenden | Diamond of the Time Traveler | Segen-Dauer verlängert | Fässer → immer Flüche |
+| C | Diamant des Zeitreisenden | Diamond of the Time Traveler | Segen-Dauer verlängert | Fässer → immer Flýche |
 | C | Hoffnung des Verdurstenden | Hope of the Thirsty One | Mehr verfluchte Türen | – |
 | C | Verfluchte Perle | Cursed Pearl | – | – |
 | C | Blutstropfen der Opfergabe | Blood Drop of Sacrifice | Weniger Schaden durch Opfertüren | – |
-| D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Türen |
-| E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Türen | – |
+| D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Tøren |
+| E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Tøren | – |
 | E | Kronjuwel des Teufels | Crown Jewel of the Devil | Chance auf epische Türen | Monster hinter Türen |
 | F | Findling des Tölpels | ? | Weniger Opfertøren | +30% Schaden bei Flucht-Fail |
 | F | Kiesel der Hinterlist | Pebble of Deceit | Monster weniger Schaden | Monster hinter Türen |
@@ -362,11 +363,11 @@ Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 
 - [x] Legendäre Truhe nach Endboss: Run endet nach Item einpacken, kein Post-state, direkt Auswahlbildschirm
 - [x] Hungrige Tür: `param=40`, akzeptiert Arkane Splitter / Sanduhren / Seelen / Steine
-- [x] SSP: `param=90` = Stein, `param=92` = Schere (Papier noch unbestätigt)
+- [x] SSP: `param=90` = Stein, `param=91` = Papier, `param=92` = Schere; `monster=90/91/92` = Gleichstand Stein/Papier/Schere
 - [x] Sarkophag: state=312 (Gold)
 - [ ] Segenstür (param=?)
 - [ ] iadungeonsave Felder [4]–[16], [18], [20]–[21], [23]–[50]
-- [ ] Dungeon-Typ Feld [1]: 2=normal, 3=LD Ultimate?
+- [ ] Dungeon-Typ Feld [1]: 0=normal, ?=LD Ultimate (Hypothese: 1 oder 3)
 - [ ] buff_id=1 genauer klären (Plønderer vs. Weg der Besserung)
 - [ ] Boss-Varianten A/B vollständig kartieren
 - [ ] Spinne, Kanalraum, Wasserraum state-Werte
