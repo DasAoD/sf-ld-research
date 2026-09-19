@@ -455,6 +455,31 @@ Auswahl per `IADungeonSelectSoulStone:{typ}` (siehe Endpoints oben).
 
 ---
 
+## Heilung nach 0 HP
+
+Fällt der Charakter im Run auf 0 HP, kommt man erst nach Warten oder gegen Pilze
+wieder rein. **Bestätigt am 2026-09-19 per UI-Screenshot** (Alexandra bei 3%,
+Gweneth bei 5% natürlich geheilt, beide zeigten dieselbe Formel):
+
+- **Natürliche Heilrate:** `4,17% Leben pro Stunde` – das ist exakt `100% / 24h`.
+  Deckt sich 1:1 mit der `GetHealingHealthPercent()`-Formel im marenga-Port.
+- **Server-seitiges Minimum:** UI zeigt "Min. 20% Leben zum Betreten benötigt!" –
+  eine harte Server-Regel, kein Bot-Setting. Erklärt, warum
+  `LegendaryDungeonMinHealingPercent` im marenga-Port als Default genau `20.0` hat.
+- **Pilz-Preis-Formel:** `Pilze = aufrunden(0,48 × fehlende %)`. Bestätigt an 2
+  Accounts:
+  - +20% Fixbutton: immer 10 Pilze (= `ceil(0,48×20)`), bei beiden Accounts gleich
+  - Komplettheilung: 97% fehlend → 47 Pilze, 95% fehlend → 46 Pilze – beide exakt
+    `ceil(0,48×x)`
+  - Der "+20%"-Button ist also kein Sonderpreis, sondern dieselbe Formel, nur als
+    fixer Menüpunkt für " +20 Prozentpunkte" angezeigt
+- **Noch offen:** ob sich die 0,48er-Konstante mit Level/VIP-Status ändert (bisher
+  nur an 2 Accounts unterschiedlichen Levels bestätigt, beide passten); der
+  tatsächliche Request/die Response beim Bezahlen selbst (noch niemand hat real
+  bezahlt) – würde auch das Feld `iadungeon20cost` endgültig klären
+
+---
+
 ## Noch zu erforschen
 
 - [x] Legendäre Truhe nach Endboss: Run endet nach Item einpacken, kein Post-state, direkt Auswahlbildschirm
@@ -464,6 +489,7 @@ Auswahl per `IADungeonSelectSoulStone:{typ}` (siehe Endpoints oben).
 - [x] Segenstür: kein eigener param, ist nur Türtyp `1010` in der Türauswahl (siehe "Türauswahl")
 - [x] Türauswahl-Mechanik komplett dokumentiert (siehe "Türauswahl"), inkl. aller Türtypen und Blocked-Door-Verhalten
 - [x] Klunker-Auswahl-Endpoint: `IADungeonSelectSoulStone`, kein `param=70` (siehe "Eigene Endpoints")
+- [x] Heilungsrate und Pilz-Preisformel nach 0 HP (siehe "Heilung nach 0 HP") – natürliche Rate und Preis-Formel bestätigt, echter Bezahl-Request noch offen
 - [x] Händler-Kauf-Endpoint: `IADungeonMerchantBuy`/`IADungeonDebuffMerchantBuy`, kein `param=70` (siehe "Eigene Endpoints")
 - [x] iadungeonsave `[15]`=Stage, `[17]`=Etage, `[18]`=Max-Etage, `[19]`/`[20]`=Türtypen (im DoorSelect) bzw. Raumzustand, `[23]`=Gold-Betrag (state=316)
 - [ ] iadungeonsave restliche Felder `[5]`–`[14]`, `[16]`, `[21]`, `[24]`, `[27]`–`[50]` (Segen/Fluch-Slots, Merchant-Angebote etc. – siehe marenga-Port `LegendaryDungeon.cs` für Kandidaten-Layout, aber ungetestet)
