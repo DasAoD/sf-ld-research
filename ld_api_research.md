@@ -57,9 +57,28 @@ Bestätigt an echten Requests, 2026-09-19 (siehe Abschnitt "Türauswahl" für de
 
 | Endpoint | Format | Kontext | Bestätigt an |
 |----------|--------|---------|---------------|
+| `IADungeonStart` | `{themeId}/{modus}` | Dungeon (neu) betreten | alle 7 Accounts, bisher immer `modus=0` (Normal-Modus) |
 | `IADungeonMerchantBuy` | `{effektId}/{schlüssel}` | Segen beim Schlüsselmeister kaufen | alle 7 Accounts |
 | `IADungeonDebuffMerchantBuy` | `{effektId}/{schlüssel}` | Fluch beim Fluchhändler kaufen | noch nicht beobachtet (kein Account war im Fluchhändler) |
 | `IADungeonSelectSoulStone` | `{klunkerId}` | Klunker-Wahl nach Boss | Alexandra (s7), Medea (s6) |
+
+**`modus` bei `IADungeonStart` vermutlich `0`=Normal, `1`=Ultimate** – unbestätigt,
+da noch niemand den Ultimate-Modus betreten hat (kostet 650 Pilze pro Event laut
+UI, gibt dafür 3-fache Ressourcen/Gold + 3 legendäre Items statt 1 am Ende).
+
+### Event-Ablauf (aus der Einstiegs-UI, 2026-09-19)
+
+- Event läuft **10 Tage**, Countdown wird auf dem Splash-Screen angezeigt
+- Nach Endboss (Raum 100) **setzt sich der Dungeon zurück** – mehrere Runs pro
+  Event möglich (erklärt vermutlich den Run-Zähler in `iadungeonsave[1]`)
+- 100 Räume verteilt auf **4 Ebenen** à 25 Räume, ein Boss am Ende jeder Ebene
+
+### Event-Themes (Zuordnung deutscher Name ↔ Theme-ID)
+
+| Theme-ID | Deutscher Name | Bestätigt an |
+|----------|-----------------|--------------|
+| `6` | Abgründe des Wahnsinns (`AbyssOfMadness`) | Eglenn (f23), 2026-09-19 |
+| `1`–`5`, `7`–`8` | noch unbeobachtet | – |
 
 `IADungeonMerchantBuy` taucht bei jedem Account genau beim Betreten des
 Schlüsselmeister-Shops (state=315) mit `params=2/0` auf, offenbar ein
