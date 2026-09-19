@@ -5,7 +5,7 @@
 > (F9, F23, F25, F28, S5, S6, S7), aufgezeichnet gegen den ungetesteten marenga-PR
 > `feat/legendary-dungeon` (the-marenga/mfbot#454), um dessen Annahmen zu
 > verifizieren.  
-> Fehlend: Einige Sonderfälle, state=317 unbeobachtet, state=306 nicht per Video bestätigt
+> Fehlend: Einige Sonderfälle, state=317 unbeobachtet
 
 ---
 
@@ -199,7 +199,7 @@ Format: `iadungeonstats:{a}/{b}/{c}/{d}/{e}`
 | `303` | Goldene Tür → Steinhaufen (Steine für Festung) |
 | `304` | Goldene Tür → Lavaraum (HP-VerFgust beim Betreten) |
 | `305` | Goldene Tür → Dungeon-Erzähler (Tee trinken = HP + Segen) |
-| `306` | Goldene Tür → leerer Raum (kein Effekt) |
+| `306` | Goldene Tür → Überfluteter Raum (10-Sekunden-Ertrink-Timer, siehe "Goldene Räume") |
 | `307` | Goldene Tür → Wunschbrunnen (Münze einwerfen → Item oder Segen; kein Auswahlfeld) |
 | `308` | Schere-Stein-Papier-Raum |
 | `309` | Goldene Tür (allgemein) |
@@ -207,8 +207,8 @@ Format: `iadungeonstats:{a}/{b}/{c}/{d}/{e}`
 | `312` | Goldene Tür → Sarkophag (Gold) |
 | `314` | Goldene Tür → Ressourcenraum (Holzstapel, etc.) |
 | `315` | Schlüsselmeister-Händler (Segen, Lebenselixiere, etc.) |
-| `316` | Goldene Tür → Schatztruhe (Silberne o.ä.) |
-| `317` | Schicksalstür / Glücksrad (zufällige Belohnung, kein Schlüssel nötig) |
+| `316` | Goldene Tür → **Glücksrad** (bestätigt per Video, siehe "Goldene Räume" – nicht Schatztruhe, wie hier ursprünglich vermutet) |
+| `317` | Unbestätigt – ursprünglich hier als "Schicksalstür/Glücksrad" vermutet, das war falsch (Glücksrad ist `316`, Schicksalstür ist ein Türtyp, kein Raum-state). Der marenga-Port nennt `317` "SpiderWeb" (Spinnennetz) – plausibel laut Wiki, aber noch nie beobachtet. |
 | `321` | Goldene Tür → Seelenbad (Seelen für die Unterwelt) |
 | `322` | Spezialraum ohne Kampf (Arkane Splitter-Höhle, leerer Raum, etc.) |
 | `323` | Fluchhändler-Raum |
@@ -443,7 +443,7 @@ Leuchten). **Offiziell dokumentiert** im Playa-Wiki:
 | `312` | Sarkophag | Unverschlossen: Gold. Verschlossen (Schlüssel nötig): garantiert episches Item. |
 | `314` | Holzstapel | Wegräumen für Festungslager-Ressourcen (Holz/Stein/Metall) |
 | `315` | Schlüsselmeister-Shop | Segen gegen Schlüssel (siehe "Eigene Endpoints") |
-| `316` | **Vermutlich nicht "Glücksrad"** – gibt laut 2 unabhängigen Accounts (F25, S5) **immer** einen festen Gold-Betrag (`iadungeonsave[23]`, exakt gegen `resources`-Delta nachgerechnet), nie Verlust. Das Wiki beschreibt Glücksrad aber ausdrücklich als riskant ("bei Pech Schlüsselverlust oder Fluch") – passt nicht zu unseren Beobachtungen. Der marenga-PR nennt `316` "WheelOfFortune" und behandelt es entsprechend als HP-gatetes Risiko – vermutlich falsch, siehe TODO in `LegendaryDungeon.cs`. |
+| `316` | **Glücksrad – bestätigt per Videoaufnahme (2026-09-19), unsere frühere "vermutlich nicht Glücksrad"-These war falsch.** Das Rad hat 8 Felder (Gold, 2x Fluch-Symbol, 2x Segen-Symbol, Schlüssel+1, Schlüssel-1). Beide unabhängig aufgezeichneten Drehungen (F25, S5) landeten zufällig auf "Gold" – der angezeigte Münz-Betrag (`13.150.028` bzw. `13.609.424`, ×100 skaliert) deckt sich exakt mit dem in `iadungeonsave[23]` gefundenen und gegen `resources` verifizierten Betrag. Der marenga-PR hat mit `WheelOfFortune` also recht. **Bleibt aber ein offener Punkt:** Der marenga-Tasker behandelt `WheelOfFortune` als reinen HP-Risiko-Raum (`HandleDamageRoom`, HP-%-gated) – das eigentliche Risiko hier ist aber Fluch/Schlüsselverlust, nicht direkter HP-Schaden. Ob die HP-basierte Gating-Logik für diesen Raumtyp überhaupt die richtige Dimension ist, ist fraglich, siehe TODO in `LegendaryDungeon.cs`. |
 | `317` | Vermutlich **Spinnennetz** (marenga-PR: `SpiderWeb`) – 3 Varianten mit steigendem Risiko: Beine sichtbar (viele Schlüssel, wenig Gift-Risiko), Kopf sichtbar (Gleichstand 2 Schlüssel oder Gift), ganze Spinne (hohes Gift-Risiko, seltene 5-Schlüssel-Belohnung). Noch nicht in echten Daten gesehen. |
 | `321` | Seelenbad | Klicken schreibt Seelen in der Unterwelt gut |
 | `322` | Arkane Splitter-Höhle | Splitter sammeln für den Schmied |
@@ -586,6 +586,7 @@ wieder rein. **Bestätigt am 2026-09-19 per UI-Screenshot** (Account auf S7 bei
 - [ ] buff_id=1 genauer klären (Plønderer vs. Weg der Besserung)
 - [ ] Boss-Varianten A/B vollständig kartieren
 - [x] state=306 gelöst: **Überfluteter Raum**, laut Wiki 10-Sekunden-Ertrink-Timer – kein Widerspruch mehr zu "kein messbarer Effekt" im HAR (Bot verlässt sofort)
+- [x] state=316 gelöst: **Glücksrad**, per Videoaufnahme bestätigt (2026-09-19) – marenga-PR hatte recht, unsere Zwischenthese "vermutlich nicht Glücksrad" war falsch. Offen bleibt, ob die HP-basierte Risiko-Bewertung im Tasker für diesen Raumtyp die richtige Dimension ist (Risiko ist Fluch/Schlüssel, nicht HP)
 - [ ] state=317 (marenga-Port: "SpiderWeb") – laut Wiki ein eigenständiger, gut beschriebener Raumtyp (3 Risikostufen, Schlüssel vs. Gift), plausibel korrekt benannt, aber noch nie in echten Daten gesehen
 - [x] Restliche Golden-Room-states (302, 311, 313, 319, 320, 324–328 im marenga-Port benannt) geklärt: **Edition-exklusiv** (Geburtstags-/Halloween-/LOTR-Editionen, siehe "Edition-exklusive Goldene Räume") – deshalb nie im aktuellen Event gesehen, kein Datenproblem
 - [x] Fluchhändler (state=323) und `IADungeonDebuffMerchantBuy`: bestätigt 2026-09-19, Effekt `104` (GoldRushHangover) für 1-2 Schlüssel gekauft. Offizieller Name: Scheibenkleistermeister.
