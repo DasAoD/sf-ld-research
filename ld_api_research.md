@@ -2,8 +2,7 @@
 
 > Status: **Work in Progress** – basierend auf 70+ Charakter-Runs (Räume 1–100)
 > plus einem gezielten zweiten Durchgang am 2026-09-19 mit 7 frischen Accounts
-> (Gweneth/f9, Eglenn/f23, Beedle/f25, Haui/f28, Berengar/s5, Medea/s6,
-> Alexandra/s7), aufgezeichnet gegen den ungetesteten marenga-PR
+> (F9, F23, F25, F28, S5, S6, S7), aufgezeichnet gegen den ungetesteten marenga-PR
 > `feat/legendary-dungeon` (the-marenga/mfbot#454), um dessen Annahmen zu
 > verifizieren.  
 > Fehlend: Einige Sonderfälle, state=317 unbeobachtet, state=306 nicht per Video bestätigt
@@ -60,7 +59,7 @@ Bestätigt an echten Requests, 2026-09-19 (siehe Abschnitt "Türauswahl" für de
 | `IADungeonStart` | `{themeId}/{modus}` | Dungeon (neu) betreten | alle 7 Accounts, bisher immer `modus=0` (Normal-Modus) |
 | `IADungeonMerchantBuy` | `{effektId}/{schlüssel}` | Segen beim Schlüsselmeister kaufen | alle 7 Accounts |
 | `IADungeonDebuffMerchantBuy` | `{effektId}/{schlüssel}` | Fluch beim Fluchhändler kaufen | **bestätigt 2026-09-19**, 2 Accounts kauften Effekt `104` (GoldRushHangover) für 1-2 Schlüssel |
-| `IADungeonSelectSoulStone` | `{klunkerId}` | Klunker-Wahl nach Boss | Alexandra (s7), Medea (s6) |
+| `IADungeonSelectSoulStone` | `{klunkerId}` | Klunker-Wahl nach Boss | S7, S6 |
 
 **`modus` bei `IADungeonStart` vermutlich `0`=Normal, `1`=Ultimate** – unbestätigt,
 da noch niemand den Ultimate-Modus betreten hat (kostet 650 Pilze pro Event laut
@@ -77,7 +76,7 @@ UI, gibt dafür 3-fache Ressourcen/Gold + 3 legendäre Items statt 1 am Ende).
 
 | Theme-ID | Deutscher Name | Bestätigt an |
 |----------|-----------------|--------------|
-| `6` | Abgründe des Wahnsinns (`AbyssOfMadness`) | Eglenn (f23), 2026-09-19 |
+| `6` | Abgründe des Wahnsinns (`AbyssOfMadness`) | F23, 2026-09-19 |
 | `1`–`5`, `7`–`8` | noch unbeobachtet | – |
 
 `IADungeonMerchantBuy` taucht bei jedem Account genau beim Betreten des
@@ -107,6 +106,16 @@ Wand nicht anklicken/auswählen, sie blockiert nur diese eine Seite.
 **Fixer Raum auf Etage 4:** Bei allen 6 Accounts, die so weit kamen, war Etage 4
 (die 5. Türauswahl) identisch: eine Wand + eine Schlüsselmeister-Tür. Das wirkt
 wie ein erzwungener früher Schlüsselmeister-Besuch, kein Zufall.
+
+**Bosstür ist immer erzwungen:** Laut Playa-Wiki ist bei einer Bosstür **die
+andere Tür immer zugemauert** – eine allgemeine Regel, nicht nur ein
+Zufallsbefund. Deckt sich mit unseren Beobachtungen bei den Bossräumen
+(Etage 24, 49 etc. zeigten immer Wand+Bosstür-Paare). Das ist unabhängig vom
+Etage-4-Sonderfall oben (verschiedene Mechanik, gleiches Symptom "Wand +
+erzwungene andere Tür").
+
+**Offiziell dokumentiert:** [Doors-Wiki](https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/282-legendary-dungeon---doors/?p=web),
+abgeglichen 2026-09-19 – deckt sich mit allen unten aufgeführten Türtypen.
 
 ### Beobachtete Türtypen (Feld `[19]`/`[20]` im DoorSelect-Zustand)
 
@@ -349,6 +358,24 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/1/-315`
 
 ---
 
+## Segen & Flüche – Mechanik-Regeln
+
+**Offiziell aus dem In-Game-Infotext (2026-09-19), bisher nirgends dokumentiert:**
+
+- Schlüssel kommen **ausschließlich von besiegten Monstern** ("Jedes im
+  Legendary Dungeon besiegte Monster hat die Chance, einen Schlüssel in seinen
+  Taschen zu haben") – nicht aus Truhen
+- Ab **Ebene 2** (Raum 26+) können auch **normale Monster-Angriffe** einen
+  Fluch verursachen, nicht nur Türen/Fässer/Truhen
+- **Gleicher Segen/Fluch erneut erhalten → Dauer wird komplett überschrieben**
+  (kein Stapeln, reiner Reset des Zählers)
+- **Alle 3 Slots belegt + neuer Segen/Fluch → überschreibt Slot 0** (den
+  ältesten/ersten), nicht den kürzesten oder zufällig
+- **Gegen Bosse zeigen Segen, Flüche UND Schicksalsklunker keine Wirkung** –
+  wichtig für jede Score-Funktion, die vor einem Bosskampf mit Effekten rechnet
+- Der Fluchhändler heißt offiziell **Scheibenkleistermeister** (nicht nur
+  "Fluchhändler")
+
 ## Segen & Flüche – bekannte usedbuffs-IDs
 
 | buff_id | Typ | Bedeutung |
@@ -397,27 +424,49 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/1/-315`
 
 ## Goldene Räume
 
-Goldene Räume erscheinen hinter goldenen Türen (state=309 allgemein).
+Goldene Räume erscheinen hinter goldenen Türen (leicht erkennbar am goldenen
+Leuchten). **Offiziell dokumentiert** im Playa-Wiki:
+[Golden Rooms](https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/284-legendary-dungeons---golden-rooms/?p=web)
+(2026-09-19 abgeglichen, siehe Korrekturen unten).
 
 | state | Raumtyp | Inhalt |
 |-------|---------|--------|
-| `301` | Lebensbrunnen | 25% HP-Heilung |
-| `303` | Steinhaufen | Steine für Festung |
-| `304` | Lavaraum | HP-Verlust beim Betreten |
+| `301` | Lebensbrunnen | Heilt einen Teil der Lebensenergie (Basisversion). Spezialvariante entfernt zusätzlich Flüche. |
+| `303` | Steinhaufen | Versperrt den Weg; Wegräumen bringt Steine fürs Festungslager |
+| `304` | Der Boden ist Lava | Pflicht-Durchquerung, kostet Lebensenergie |
 | `305` | Dungeon-Erzähler | Tee trinken: HP + Segen; ablehnen: kein Effekt |
-| `306` | Leerer goldener Raum | Kein Effekt (2026-09-19: weder HP- noch Gold-/Loot-Änderung beobachtet – stützt "kein Effekt", aber kein Video zur endgültigen Bestätigung) |
+| `306` | **Überfluteter Raum** (nicht "kein Effekt") – Raum füllt sich mit Wasser, wer nicht **innerhalb von 10 Sekunden** verlässt, ertrinkt. Erklärt, warum unser HAR-Test keinen Effekt zeigte: der Bot verlässt sofort per `param=50`, lange bevor die 10s um sind. |
 | `307` | Wunschbrunnen | Münze einwerfen → Item oder Segen; kein Auswahlfeld |
-| `308` | Schere-Stein-Papier | Segen + Item bei Gewinn; Fluch + 10% Schaden bei Verlust |
-| `309` | Goldene Tür (allgemein) | Kanalisation, Spinne, etc. |
-| `312` | Sarkophag | Gold erhalten |
-| `310` | Erleuchteter Durchgang | Monster mit Laterne dahinter |
-| `314` | Holzstapel / Ressourcenraum | Holz, Stein, Metall, etc. |
-| `315` | Schlüsselmeister-Shop | Segen, Lebenselixiere gegen Schlüssel/Pilze |
-| `316` | Schatztruhe | Gold erhalten – **bestätigt 2026-09-19**: Betrag steht in `iadungeonsave[23]`, exakt gegen `resources`-Delta nachgerechnet (Beedle/f25, Berengar/s5). Der marenga-PR klassifiziert `316` fälschlich als "Wheel of Fortune" (HP-gatete Risiko-Aktion) – widerlegt, keiner der beiden Runs nahm dabei Schaden. |
-| `321` | Seelenbad | Seelen für die Unterwelt |
-| `322` | Arkane Splitter-Höhle / leer | Arkane Splitter oder leer |
-| `323` | Fluchhändler | Schlüssel gegen Flüche |
+| `308` | Schere-Stein-Papier | Sieg: Segen + Item; Niederlage: Fluch + Schaden; Unentschieden: nichts |
+| `309` | Kanalisation | Brühe durchsuchen → Item; Verlassen ohne Strafe |
+| `310` | Laternenmonster | Kampf oder Flucht gegen das Monster mit Laterne |
+| `312` | Sarkophag | Unverschlossen: Gold. Verschlossen (Schlüssel nötig): garantiert episches Item. |
+| `314` | Holzstapel | Wegräumen für Festungslager-Ressourcen (Holz/Stein/Metall) |
+| `315` | Schlüsselmeister-Shop | Segen gegen Schlüssel (siehe "Eigene Endpoints") |
+| `316` | **Vermutlich nicht "Glücksrad"** – gibt laut 2 unabhängigen Accounts (F25, S5) **immer** einen festen Gold-Betrag (`iadungeonsave[23]`, exakt gegen `resources`-Delta nachgerechnet), nie Verlust. Das Wiki beschreibt Glücksrad aber ausdrücklich als riskant ("bei Pech Schlüsselverlust oder Fluch") – passt nicht zu unseren Beobachtungen. Der marenga-PR nennt `316` "WheelOfFortune" und behandelt es entsprechend als HP-gatetes Risiko – vermutlich falsch, siehe TODO in `LegendaryDungeon.cs`. |
+| `317` | Vermutlich **Spinnennetz** (marenga-PR: `SpiderWeb`) – 3 Varianten mit steigendem Risiko: Beine sichtbar (viele Schlüssel, wenig Gift-Risiko), Kopf sichtbar (Gleichstand 2 Schlüssel oder Gift), ganze Spinne (hohes Gift-Risiko, seltene 5-Schlüssel-Belohnung). Noch nicht in echten Daten gesehen. |
+| `321` | Seelenbad | Klicken schreibt Seelen in der Unterwelt gut |
+| `322` | Arkane Splitter-Höhle | Splitter sammeln für den Schmied |
+| `323` | Scheibenkleistermeister (Fluchhändler) | Kauft Schlüssel gegen Flüche – **bestätigt 2026-09-19**, Effekt `104` gekauft |
 | `329` | Zeughaus (Räume 90–98) | Episches Item (10% Chance legendär bei 2 Waffen) |
+
+### Edition-exklusive Goldene Räume
+
+Der marenga-Port benennt weitere state-Werte, die wir bisher nie gesehen haben
+(`302`, `311`, `313`, `319`, `320`, `324`–`328`). Grund gefunden: **das sind
+Sonder-Editionen**, die nur während bestimmter Events im Raumpool sind, laut
+Wiki nicht im aktuell laufenden Event ("Abgründe des Wahnsinns"):
+
+| Edition | Räume |
+|---------|-------|
+| Geburtstags-Edition | Umkleide (episches Item), Flimmerkiste (10 Glücksmünzen), Beta-Raum (Kampf/Flucht), 3D-Shakes (Segen bei Sieg / Schaden bei Niederlage) |
+| Herr-der-Ringe-Edition | Valaraukar (Kampf kostet HP, gibt "Weg der Besserung"-Segen; Flucht optional) |
+| Halloween-Edition | Auktionshaus (Item, ggf. episch), Regenbogen-Raum (Segen kostet HP), Schweine-Raum (Kampf mit Netto-HP-Gewinn) |
+
+Erklärt, warum diese über 10 Accounts (davon 3 mit mehreren Chars) nie
+aufgetaucht sind – sie gehören schlicht nicht zum aktuellen Event. Zum Testen
+bräuchten wir Captures während einer Geburtstags-/Halloween-/LOTR-Ausgabe des
+LD.
 
 ---
 
@@ -426,7 +475,10 @@ Goldene Räume erscheinen hinter goldenen Türen (state=309 allgemein).
 Nach den Bossen in Räumen 25, 50 und 75 **muss** man einen von drei Klunkern wählen. Nach dem Endboss (Raum 100) gibt es stattdessen eine legendäre Truhe – kein Klunker.  
 Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 
-**Bestätigt am 2026-09-19** (Medea/s6 + Alexandra/s7, Angebote wörtlich mit dem
+**Offiziell bestätigt (In-Game-Infotext, 2026-09-19):** Gegen Bosse zeigen
+Schicksalsklunker keine Wirkung (wie Segen/Flüche, siehe oben).
+
+**Bestätigt am 2026-09-19** (Accounts auf S6 und S7, Angebote wörtlich mit dem
 Response-Feld `iadungeonsoulstones` abgeglichen – Effekttexte stimmen exakt):
 Spionageklunker, Glücksspielerbrocken, Auge des Stiers, Findling des Tölpels.
 
@@ -488,8 +540,8 @@ Auswahl per `IADungeonSelectSoulStone:{typ}` (siehe Endpoints oben).
 ## Heilung nach 0 HP
 
 Fällt der Charakter im Run auf 0 HP, kommt man erst nach Warten oder gegen Pilze
-wieder rein. **Bestätigt am 2026-09-19 per UI-Screenshot** (Alexandra bei 3%,
-Gweneth bei 5% natürlich geheilt, beide zeigten dieselbe Formel):
+wieder rein. **Bestätigt am 2026-09-19 per UI-Screenshot** (Account auf S7 bei
+3%, Account auf F9 bei 5% natürlich geheilt, beide zeigten dieselbe Formel):
 
 - **Natürliche Heilrate:** `4,17% Leben pro Stunde` – das ist exakt `100% / 24h`.
   Deckt sich 1:1 mit der `GetHealingHealthPercent()`-Formel im marenga-Port.
@@ -507,6 +559,14 @@ Gweneth bei 5% natürlich geheilt, beide zeigten dieselbe Formel):
   nur an 2 Accounts unterschiedlichen Levels bestätigt, beide passten); der
   tatsächliche Request/die Response beim Bezahlen selbst (noch niemand hat real
   bezahlt) – würde auch das Feld `iadungeon20cost` endgültig klären
+- **Abgleich mit Playa-Wiki:** Der allgemeine LD-Wiki-Artikel beschreibt die
+  Pilzkosten als "10, 15, dann 20 Pilze für aufeinanderfolgende Heilungen
+  innerhalb eines Runs" – das widerspricht unserer Formel nicht zwingend: beide
+  UI-Screenshots waren jeweils die **erste** Nutzung in diesem Run (daher beide
+  `10`), das Wiki beschreibt vermutlich eine **zusätzliche Eskalation pro
+  Nutzung** des Fix-Buttons innerhalb desselben Runs, während unsere Formel für
+  die "Komplettheilung"-Option gilt. Ungeklärt, bis jemand den Fix-Button
+  mehrfach in einem Run nutzt.
 
 ---
 
@@ -525,12 +585,14 @@ Gweneth bei 5% natürlich geheilt, beide zeigten dieselbe Formel):
 - [ ] iadungeonsave restliche Felder `[5]`–`[14]`, `[16]`, `[21]`, `[24]`, `[27]`–`[50]` (Segen/Fluch-Slots, Merchant-Angebote etc. – siehe marenga-Port `LegendaryDungeon.cs` für Kandidaten-Layout, aber ungetestet)
 - [ ] buff_id=1 genauer klären (Plønderer vs. Weg der Besserung)
 - [ ] Boss-Varianten A/B vollständig kartieren
-- [ ] state=317 (im marenga-Port "SpiderWeb", in dieser Doku "Schicksalstür/Glücksrad") – noch nicht beobachtet, nach dem state=316-Fund mit Vorsicht zu genießen
-- [ ] state=306 per Video bestätigen (aktuell nur "kein messbarer Effekt" belegt, nicht was visuell passiert)
-- [ ] Restliche Golden-Room-states (302, 311, 313, 319, 320, 324–328 im marenga-Port benannt) gegen echte Captures prüfen – ungetestet übernommen, auch nach 10 Accounts (davon 3 mit mehreren Chars) noch keiner davon gesehen
-- [x] Fluchhändler (state=323) und `IADungeonDebuffMerchantBuy`: bestätigt 2026-09-19, Effekt `104` (GoldRushHangover) für 1-2 Schlüssel gekauft
+- [x] state=306 gelöst: **Überfluteter Raum**, laut Wiki 10-Sekunden-Ertrink-Timer – kein Widerspruch mehr zu "kein messbarer Effekt" im HAR (Bot verlässt sofort)
+- [ ] state=317 (marenga-Port: "SpiderWeb") – laut Wiki ein eigenständiger, gut beschriebener Raumtyp (3 Risikostufen, Schlüssel vs. Gift), plausibel korrekt benannt, aber noch nie in echten Daten gesehen
+- [x] Restliche Golden-Room-states (302, 311, 313, 319, 320, 324–328 im marenga-Port benannt) geklärt: **Edition-exklusiv** (Geburtstags-/Halloween-/LOTR-Editionen, siehe "Edition-exklusive Goldene Räume") – deshalb nie im aktuellen Event gesehen, kein Datenproblem
+- [x] Fluchhändler (state=323) und `IADungeonDebuffMerchantBuy`: bestätigt 2026-09-19, Effekt `104` (GoldRushHangover) für 1-2 Schlüssel gekauft. Offizieller Name: Scheibenkleistermeister.
 - [ ] **Neu aufgemacht:** `iadungeonsave[1]` – weder "Dungeon-Typ/Run-Nummer" (alte Doku) noch "HealthStatus" (marenga-Port) passen zu den Daten (siehe Korrektur-Hinweis oben bei den Feldern)
 - [ ] **Neu:** Boss-Monster-IDs scheinen Theme-abhängig zu sein – aktuelles Event (`AbyssOfMadness`) nutzt `-5297`(Boss 1)/`-5298`(Boss 2), komplett anders als die alte Tabelle (`-514x`). Zweiter Run nötig, um Variante A/B zu klären
+- [x] Segen/Fluch-Mechanik (Stapel-, Slot- und Boss-Immunitätsregeln) offiziell dokumentiert, siehe "Segen & Flüche – Mechanik-Regeln"
+- [ ] Pilz-Preisstaffelung bei mehrfacher Heilnutzung im selben Run (10→15→20 laut Wiki) noch nicht mit echten Daten verifiziert
 
 ---
 
@@ -538,10 +600,15 @@ Gweneth bei 5% natürlich geheilt, beide zeigten dieselbe Formel):
 
 - HAR-Aufzeichnungen: 80+ Charakter-Runs auf verschiedenen Servern (F9, F25, F28)
 - Gezielter zweiter Durchgang 2026-09-19: 7 Accounts (F9, F23, F25, F28, S5, S6, S7)
-  plus ein Nachschlag mit weiteren Charakteren (Dr Avalanche, Old Harry, Durdle Door,
-  Malya Krähenarzt, Tharon Miasma, Xyra Fieberkuss u.a., teils in Sammel-HARs mit
-  mehreren Accounts pro Datei),
+  plus ein Nachschlag mit weiteren Charakteren auf F9, F25 und F28 (teils mehrere
+  pro Server, teils in Sammel-HARs mit mehreren Accounts pro Datei),
   aufgezeichnet um die Annahmen im marenga-PR `feat/legendary-dungeon`
   (the-marenga/mfbot#454, ungetestet) zu verifizieren
-- Playa Games Helpshift: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/57-legendary-dungeon/
+- Playa Games Helpshift (offizielles Wiki, 2026-09-19 vollständig ausgewertet):
+  - Übersicht: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/57-legendary-dungeon/
+  - Türen: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/282-legendary-dungeon---doors/?p=web
+  - Truhen: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/283-legendary-dungeon---chests/?p=web
+  - Goldene Räume: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/284-legendary-dungeons---golden-rooms/?p=web
+  - Das In-Game-Infofenster verlinkt exakt auf dieselben Wiki-Seiten – deckt
+    sich, keine widersprüchlichen Quellen
 - ldgadget.12hp.de: https://ldgadget.12hp.de
