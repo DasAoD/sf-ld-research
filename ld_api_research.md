@@ -59,7 +59,7 @@ Bestätigt an echten Requests, 2026-09-19 (siehe Abschnitt "Türauswahl" für de
 |----------|--------|---------|---------------|
 | `IADungeonStart` | `{themeId}/{modus}` | Dungeon (neu) betreten | alle 7 Accounts, bisher immer `modus=0` (Normal-Modus) |
 | `IADungeonMerchantBuy` | `{effektId}/{schlüssel}` | Segen beim Schlüsselmeister kaufen | alle 7 Accounts |
-| `IADungeonDebuffMerchantBuy` | `{effektId}/{schlüssel}` | Fluch beim Fluchhändler kaufen | noch nicht beobachtet (kein Account war im Fluchhändler) |
+| `IADungeonDebuffMerchantBuy` | `{effektId}/{schlüssel}` | Fluch beim Fluchhändler kaufen | **bestätigt 2026-09-19**, 2 Accounts kauften Effekt `104` (GoldRushHangover) für 1-2 Schlüssel |
 | `IADungeonSelectSoulStone` | `{klunkerId}` | Klunker-Wahl nach Boss | Alexandra (s7), Medea (s6) |
 
 **`modus` bei `IADungeonStart` vermutlich `0`=Normal, `1`=Ultimate** – unbestätigt,
@@ -142,7 +142,7 @@ Format: `iadungeon.iadungeonsave:{f0}/{f1}/{f2}/...`
 | Index | Bedeutung | Beispielwert |
 |-------|-----------|--------------|
 | `[0]` | Charakter-ID (konstant) | `664444180` |
-| `[1]` | Dungeon-Typ / Run-Nummer (0=1. Run normal, 1=2. Run normal, 2=1. Run Ultimate) | `0` |
+| `[1]` | **Umstritten:** bisher als Dungeon-Typ/Run-Nummer dokumentiert (0=1. Run normal, 1=2. Run normal, 2=1. Run Ultimate). Der marenga-Port liest dasselbe Feld als `HealthStatus` (2=lebt). Neue Daten (2026-09-19) zeigen aber `[1]=2` bei **allen** frischen Erst-Runs im Normal-Modus (müsste nach der alten Lesart `0` sein) – und einmal sogar `[1]=2` bei `CurrentHp=0`. Beide Deutungen passen nicht zu den Daten, Feld bleibt ungeklärt. | `2` (fast immer) |
 | `[2]` | Aktuelle HP | `82426523` |
 | `[3]` | **Korrektur:** nicht Maximale HP, sondern HP vor der letzten Aktion (für die Lebensbalken-Animation) | `82426523` |
 | `[4]` | Maximale HP (das war vorher fälschlich als `[3]` dokumentiert) | `139762968` |
@@ -308,6 +308,17 @@ Negative Werte = reguläre Monster-IDs.
 | `-5147` | Endboss Variante B (Raum 100, 2. Durchlauf) |
 | `-5148` | Endboss Variante A (Raum 100) |
 | `-5240` bis `-5245` | Spezial-Monster (Geburtstags-LD o.ä.) |
+
+> **Wichtige Korrektur (2026-09-19):** Die Boss-Monster-IDs sind offenbar
+> **Theme-abhängig**, nicht global fix! Im aktuellen Event "Abgründe des
+> Wahnsinns" (`AbyssOfMadness`, Theme-ID 6) zeigen **alle** Accounts, die Boss 1
+> erreicht haben (6+ unabhängige Chars), exakt `monster=-5297` auf Raum 25 –
+> nicht die oben dokumentierten `-5141`/`-5142`. Ein Account erreichte Raum 50
+> mit `monster=-5298`. Die Tabelle oben stammt vermutlich aus einem anderen
+> Event/Theme mit eigenem Monster-Pool. Bisher **keine zweite Variante**
+> innerhalb dieses Events gesehen – möglich, dass Variante A/B nicht zufällig
+> ist, sondern am Run-Zähler hängt (alle bisherigen Accounts waren im 1. Run,
+> `iadungeonsave[1]`=0). Braucht Bestätigung durch einen 2. Run.
 
 ---
 
@@ -516,15 +527,20 @@ Gweneth bei 5% natürlich geheilt, beide zeigten dieselbe Formel):
 - [ ] Boss-Varianten A/B vollständig kartieren
 - [ ] state=317 (im marenga-Port "SpiderWeb", in dieser Doku "Schicksalstür/Glücksrad") – noch nicht beobachtet, nach dem state=316-Fund mit Vorsicht zu genießen
 - [ ] state=306 per Video bestätigen (aktuell nur "kein messbarer Effekt" belegt, nicht was visuell passiert)
-- [ ] Restliche Golden-Room-states (302, 311, 313, 319, 320, 324–328 im marenga-Port benannt) gegen echte Captures prüfen – ungetestet übernommen
-- [ ] Fluchhändler (state=323) und `IADungeonDebuffMerchantBuy` noch nicht in echten Daten gesehen
+- [ ] Restliche Golden-Room-states (302, 311, 313, 319, 320, 324–328 im marenga-Port benannt) gegen echte Captures prüfen – ungetestet übernommen, auch nach 10 Accounts (davon 3 mit mehreren Chars) noch keiner davon gesehen
+- [x] Fluchhändler (state=323) und `IADungeonDebuffMerchantBuy`: bestätigt 2026-09-19, Effekt `104` (GoldRushHangover) für 1-2 Schlüssel gekauft
+- [ ] **Neu aufgemacht:** `iadungeonsave[1]` – weder "Dungeon-Typ/Run-Nummer" (alte Doku) noch "HealthStatus" (marenga-Port) passen zu den Daten (siehe Korrektur-Hinweis oben bei den Feldern)
+- [ ] **Neu:** Boss-Monster-IDs scheinen Theme-abhängig zu sein – aktuelles Event (`AbyssOfMadness`) nutzt `-5297`(Boss 1)/`-5298`(Boss 2), komplett anders als die alte Tabelle (`-514x`). Zweiter Run nötig, um Variante A/B zu klären
 
 ---
 
 ## Quellen
 
 - HAR-Aufzeichnungen: 80+ Charakter-Runs auf verschiedenen Servern (F9, F25, F28)
-- Gezielter zweiter Durchgang 2026-09-19: 7 Accounts (F9, F23, F25, F28, S5, S6, S7),
+- Gezielter zweiter Durchgang 2026-09-19: 7 Accounts (F9, F23, F25, F28, S5, S6, S7)
+  plus ein Nachschlag mit weiteren Charakteren (Dr Avalanche, Old Harry, Durdle Door,
+  Malya Krähenarzt, Tharon Miasma, Xyra Fieberkuss u.a., teils in Sammel-HARs mit
+  mehreren Accounts pro Datei),
   aufgezeichnet um die Annahmen im marenga-PR `feat/legendary-dungeon`
   (the-marenga/mfbot#454, ungetestet) zu verifizieren
 - Playa Games Helpshift: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/57-legendary-dungeon/
