@@ -1,7 +1,12 @@
 # Legendary Dungeon – API Research
 
-> Status: **Work in Progress** – basierend auf 70+ Charakter-Runs (Räume 1–100)  
-> Fehlend: Einige Sonderfälle, Segenstür param
+> Status: **Work in Progress** – basierend auf 70+ Charakter-Runs (Räume 1–100)
+> plus einem gezielten zweiten Durchgang am 2026-09-19 mit 7 frischen Accounts
+> (Gweneth/f9, Eglenn/f23, Beedle/f25, Haui/f28, Berengar/s5, Medea/s6,
+> Alexandra/s7), aufgezeichnet gegen den ungetesteten marenga-PR
+> `feat/legendary-dungeon` (the-marenga/mfbot#454), um dessen Annahmen zu
+> verifizieren.  
+> Fehlend: Einige Sonderfälle, state=317 unbeobachtet, state=306 nicht per Video bestätigt
 
 ---
 
@@ -38,9 +43,76 @@ GET https://f{server}.sfgame.net/cmd.php?req=IADungeonInteract&params={base64}&s
 | `91` | Schere-Stein-Papier: Papier wählen | SSP-Raum |
 | `92` | Schere-Stein-Papier: Schere wählen | SSP-Raum |
 
-> **Hinweis:** Händler-Käufe und Klunker-Auswahl nach Boss erfolgen über `param=70` – kein eigener param!  
+> **Korrektur (2026-09-19):** Die frühere Annahme "Händler-Käufe und Klunker-Auswahl
+> laufen über `param=70`" war falsch. Beides hat einen eigenen Endpoint (siehe unten),
+> bestätigt an echten Requests aus 7 Accounts.  
 > **Hungrige Tür:** `param=40` zum Bezahlen/Öffnen, danach steht Satte Kiste (monster=603) dahinter.  
-> **Noch unbekannt:** param für Segenstør
+> **Segenstür gelöst:** kein eigener Aktionscode nötig – die Segenstür ist einfach ein
+> Türtyp in der Türauswahl (siehe Abschnitt "Türauswahl" unten), man betritt sie wie
+> jede andere Tür.
+
+### Eigene Endpoints (nicht über IADungeonInteract)
+
+Bestätigt an echten Requests, 2026-09-19 (siehe Abschnitt "Türauswahl" für den Kontext):
+
+| Endpoint | Format | Kontext | Bestätigt an |
+|----------|--------|---------|---------------|
+| `IADungeonMerchantBuy` | `{effektId}/{schlüssel}` | Segen beim Schlüsselmeister kaufen | alle 7 Accounts |
+| `IADungeonDebuffMerchantBuy` | `{effektId}/{schlüssel}` | Fluch beim Fluchhändler kaufen | noch nicht beobachtet (kein Account war im Fluchhändler) |
+| `IADungeonSelectSoulStone` | `{klunkerId}` | Klunker-Wahl nach Boss | Alexandra (s7), Medea (s6) |
+
+`IADungeonMerchantBuy` taucht bei jedem Account genau beim Betreten des
+Schlüsselmeister-Shops (state=315) mit `params=2/0` auf, offenbar ein
+automatischer "Angebot ansehen"-Call des Spiel-Clients, keine echte
+Kauf-Transaktion (0 Schlüssel = kein Kauf).
+
+---
+
+## Türauswahl (Door Select)
+
+**Bisher komplett undokumentiert gewesen – größte Lücke der alten Doku, jetzt geschlossen.**
+
+Vor jedem Raum (auch vor Raum 1) steht ein Zwei-Türen-Auswahlbildschirm. Erkennbar
+an `iadungeonsave[15]=1` (state/stage). In diesem Zustand stehen in `[19]`/`[20]`
+die beiden Türtypen (statt Raum-`state` wie sonst), Fallen dazu in `[25]`/`[26]`.
+
+**Auswahl:** `IADungeonInteract` mit `param = Position + 1` (Position 0 oder 1),
+**+4 wenn die Tür ein Schlüssel-Typ ist** (Locked/DoubleLocked/Epic). Also
+`param=1` oder `2` für normale Türen, `param=5` oder `6` wenn die gewählte Tür
+verschlossen ist und mit Schlüssel geöffnet wird.
+
+**Zugemauerte Tür (Wand):** Ist eine der beiden Optionen eine Wand, bleibt nur
+die andere wählbar – bestätigt an 12 Fällen über alle 7 Accounts. Man kann die
+Wand nicht anklicken/auswählen, sie blockiert nur diese eine Seite.
+
+**Fixer Raum auf Etage 4:** Bei allen 6 Accounts, die so weit kamen, war Etage 4
+(die 5. Türauswahl) identisch: eine Wand + eine Schlüsselmeister-Tür. Das wirkt
+wie ein erzwungener früher Schlüsselmeister-Besuch, kein Zufall.
+
+### Beobachtete Türtypen (Feld `[19]`/`[20]` im DoorSelect-Zustand)
+
+| Wert | Bedeutung |
+|------|-----------|
+| `1`/`2`/`3` | Monstertür (3 Varianten) |
+| `4`/`5` | Bosstür (2 Varianten) |
+| `1000` | Zugemauerte Tür / Wand – nicht wählbar |
+| `1001` | Fragezeichentür (zufälliger Inhalt) |
+| `1002` | Verschlossene Tür (1 Schlüssel) |
+| `1003` | Offene Tür |
+| `1004` | Epische Tür (Schlüssel nötig, Epische Truhe dahinter) |
+| `1005` | Doppelt verschlossene Tür (2 Schlüssel) |
+| `1006` | Goldene Tür |
+| `1007` | Opfertür (Lebensenergie-Kosten, Opfertruhe dahinter) |
+| `1008` | Verfluchte Tür (Fluch beim Öffnen) |
+| `1009` | Schlüsselmeister-Tür |
+| `1010` | Segenstür – **löst die alte offene Frage**, kein Extra-Aktionscode nötig |
+| `1011` | Glücksradtür |
+| `1012`–`1017` | Hungrige Türen (Holz/Stein/Seelen/Metall/Arkan/Sanduhren) |
+| `1018`–`1022` | Prüfungspforte 1–5 |
+| `1023` | Prüfungspforten-Ausgang |
+
+Alle beobachteten Werte lagen exakt in diesem Wertebereich (keine Ausreißer
+außerhalb 1-5 bzw. 1000-1023) – die Aufzählung scheint vollständig.
 
 ---
 
@@ -53,10 +125,16 @@ Format: `iadungeon.iadungeonsave:{f0}/{f1}/{f2}/...`
 | `[0]` | Charakter-ID (konstant) | `664444180` |
 | `[1]` | Dungeon-Typ / Run-Nummer (0=1. Run normal, 1=2. Run normal, 2=1. Run Ultimate) | `0` |
 | `[2]` | Aktuelle HP | `82426523` |
-| `[3]` | Maximale HP | `139762968` |
-| `[17]` | Aktuelle Raumnummer | `8` |
-| `[19]` | Raumzustand (state) | `100` |
+| `[3]` | **Korrektur:** nicht Maximale HP, sondern HP vor der letzten Aktion (für die Lebensbalken-Animation) | `82426523` |
+| `[4]` | Maximale HP (das war vorher fälschlich als `[3]` dokumentiert) | `139762968` |
+| `[15]` | Stage/Raumzustand: `1`=Türauswahl, `10`=Raum betreten, `11`=interagiert, `12`=Sonderaktion, `100`=Raum fertig | `10` |
+| `[17]` | Aktuelle Raumnummer/Etage | `8` |
+| `[18]` | Maximale Etage (immer `100` gesehen) | `100` |
+| `[19]` | Bei Stage=1: Türtyp Tür 0. Sonst: Raumzustand (state) | `100` |
+| `[20]` | Bei Stage=1: Türtyp Tür 1. Sonst: Zusatzwert (z.B. `900`/`901` nach Interaktion) | – |
 | `[22]` | Objekt/Monster im Raum | `-5085` |
+| `[23]` | **Neu:** Gold-Betrag, der bei state=316 vergeben wird – exakt gegen `resources`-Delta bestätigt (2 Accounts) | `1315002840` |
+| `[25]`/`[26]` | Bei Stage=1: Fallen-Typ auf Tür 0/1 (0 = keine Falle) | `0` |
 
 > **Noch unbekannt:** viele andere Felder (Schlüssel-Anzahl, aktive Segen/Flýche, Ressourcen, etc.)
 
@@ -118,7 +196,7 @@ Dahinter: leerer Raum, Monster-Raum oder Interaktionsraum.
 
 ### Schlüsselmeister-Händler (state=315)
 Verkauft Segen, Lebenselixiere (25% oder 50% HP) und weitere Items gegen Schlüssel oder Pilze.  
-**Kein Fluchhändler** – Flüche verkauft nur der Fluci�ändler (state=323, Scheibenkleistermeister).
+**Kein Fluchhändler** – Flüche verkauft nur der Fluci�ändler (state=323, Scheibenkleistermeister).
 
 ### Post-Raum-Zustände (nach Abschluss eines Raums)
 
@@ -297,7 +375,7 @@ Goldene Räume erscheinen hinter goldenen Türen (state=309 allgemein).
 | `303` | Steinhaufen | Steine für Festung |
 | `304` | Lavaraum | HP-Verlust beim Betreten |
 | `305` | Dungeon-Erzähler | Tee trinken: HP + Segen; ablehnen: kein Effekt |
-| `306` | Leerer goldener Raum | Kein Effekt |
+| `306` | Leerer goldener Raum | Kein Effekt (2026-09-19: weder HP- noch Gold-/Loot-Änderung beobachtet – stützt "kein Effekt", aber kein Video zur endgültigen Bestätigung) |
 | `307` | Wunschbrunnen | Münze einwerfen → Item oder Segen; kein Auswahlfeld |
 | `308` | Schere-Stein-Papier | Segen + Item bei Gewinn; Fluch + 10% Schaden bei Verlust |
 | `309` | Goldene Tür (allgemein) | Kanalisation, Spinne, etc. |
@@ -305,7 +383,7 @@ Goldene Räume erscheinen hinter goldenen Türen (state=309 allgemein).
 | `310` | Erleuchteter Durchgang | Monster mit Laterne dahinter |
 | `314` | Holzstapel / Ressourcenraum | Holz, Stein, Metall, etc. |
 | `315` | Schlüsselmeister-Shop | Segen, Lebenselixiere gegen Schlüssel/Pilze |
-| `316` | Schatztruhe | Silberne Schatztruhe o.ä. |
+| `316` | Schatztruhe | Gold erhalten – **bestätigt 2026-09-19**: Betrag steht in `iadungeonsave[23]`, exakt gegen `resources`-Delta nachgerechnet (Beedle/f25, Berengar/s5). Der marenga-PR klassifiziert `316` fälschlich als "Wheel of Fortune" (HP-gatete Risiko-Aktion) – widerlegt, keiner der beiden Runs nahm dabei Schaden. |
 | `321` | Seelenbad | Seelen für die Unterwelt |
 | `322` | Arkane Splitter-Höhle / leer | Arkane Splitter oder leer |
 | `323` | Fluchhändler | Schlüssel gegen Flüche |
@@ -317,6 +395,15 @@ Goldene Räume erscheinen hinter goldenen Türen (state=309 allgemein).
 
 Nach den Bossen in Räumen 25, 50 und 75 **muss** man einen von drei Klunkern wählen. Nach dem Endboss (Raum 100) gibt es stattdessen eine legendäre Truhe – kein Klunker.  
 Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
+
+**Bestätigt am 2026-09-19** (Medea/s6 + Alexandra/s7, Angebote wörtlich mit dem
+Response-Feld `iadungeonsoulstones` abgeglichen – Effekttexte stimmen exakt):
+Spionageklunker, Glücksspielerbrocken, Auge des Stiers, Findling des Tölpels.
+
+Response-Format `iadungeonsoulstones`: Blöcke aus je 6 Werten
+(`typ/vorteilCode/vorteilStärke/nachteilCode/nachteilStärke/spezialCode`),
+erste 3 Blöcke = aktive Klunker, restliche Blöcke = angebotene Klunker zur Wahl.
+Auswahl per `IADungeonSelectSoulStone:{typ}` (siehe Endpoints oben).
 
 | Tier | Name (DE) | Name (EN) | Effekt + | Effekt – |
 |------|-----------|-----------|----------|----------|
@@ -335,13 +422,21 @@ Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 | D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Tøren |
 | E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Tøren | – |
 | E | Kronjuwel des Teufels | Crown Jewel of the Devil | Chance auf epische Türen | Monster hinter Türen |
-| F | Findling des Tölpels | ? | Weniger Opfertøren | +30% Schaden bei Flucht-Fail |
+| F | Findling des Tölpels | **Erratic Boulder of the Hick** (bestätigt 2026-09-19, id `16`) | -Opfertüren | +30% Schaden bei Flucht-Fail |
 | F | Kiesel der Hinterlist | Pebble of Deceit | Monster weniger Schaden | Monster hinter Türen |
 | F | Magnetstein | Lodestone | Doppelt verschlossene Türen; +Schlüssel | – |
-| F | Auge des Stiers | Eye of the Bull | – | – |
-| F | Irrender Brocken des Tölpels | Erratic Boulder of the Hick | Weniger Opfertøren | – |
+| F | Auge des Stiers | Eye of the Bull (bestätigt 2026-09-19, id `1`) | -20% Monsterschaden | -30% Fluchtchance |
+| F | Irrender Brocken des Tölpels | ~~Erratic Boulder of the Hick~~ **Duplikat?** | -Opfertüren | – |
 | F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen hinter Tøren | – |
 | F | Alter Opferstein | Old Sacrifice Stone | Weniger Schaden Opfertruhen | – |
+
+> **Datenqualität der Tier-Liste:** "Findling des Tölpels" und "Irrender Brocken
+> des Tölpels" hatten in der Quelle (ldgadget.12hp.de) beide den gleichen
+> englischen Namen "Erratic Boulder of the Hick" eingetragen, obwohl es zwei
+> Zeilen mit leicht unterschiedlichem Nachteil sind. Die jetzt bestätigte id `16`
+> und ihre Effektwerte passen exakt zu "Findling des Tölpels" – die Zeile
+> "Irrender Brocken des Tölpels" ist vermutlich ein Duplikat/Fehler in der
+> Quelle und braucht eine eigene Bestätigung, falls sie tatsächlich existiert.
 
 ---
 
@@ -366,17 +461,26 @@ Tier-Liste aus ldgadget.12hp.de + Spieler-Screenshots.
 - [x] Hungrige Tür: `param=40`, akzeptiert Arkane Splitter / Sanduhren / Seelen / Steine
 - [x] SSP: `param=90` = Stein, `param=91` = Papier, `param=92` = Schere; `monster=90/91/92` = Gleichstand Stein/Papier/Schere
 - [x] Sarkophag: state=312 (Gold)
-- [ ] Segenstür (param=?)
-- [ ] iadungeonsave Felder [4]–[16], [18], [20]–[21], [23]–[50]
-- [x] Dungeon-Typ Feld [1]: 0=1. Run normal, 1=2. Run normal, 2=1. Run Ultimate (3=2. Run Ultimate, noch nicht gesehen)
+- [x] Segenstür: kein eigener param, ist nur Türtyp `1010` in der Türauswahl (siehe "Türauswahl")
+- [x] Türauswahl-Mechanik komplett dokumentiert (siehe "Türauswahl"), inkl. aller Türtypen und Blocked-Door-Verhalten
+- [x] Klunker-Auswahl-Endpoint: `IADungeonSelectSoulStone`, kein `param=70` (siehe "Eigene Endpoints")
+- [x] Händler-Kauf-Endpoint: `IADungeonMerchantBuy`/`IADungeonDebuffMerchantBuy`, kein `param=70` (siehe "Eigene Endpoints")
+- [x] iadungeonsave `[15]`=Stage, `[17]`=Etage, `[18]`=Max-Etage, `[19]`/`[20]`=Türtypen (im DoorSelect) bzw. Raumzustand, `[23]`=Gold-Betrag (state=316)
+- [ ] iadungeonsave restliche Felder `[5]`–`[14]`, `[16]`, `[21]`, `[24]`, `[27]`–`[50]` (Segen/Fluch-Slots, Merchant-Angebote etc. – siehe marenga-Port `LegendaryDungeon.cs` für Kandidaten-Layout, aber ungetestet)
 - [ ] buff_id=1 genauer klären (Plønderer vs. Weg der Besserung)
 - [ ] Boss-Varianten A/B vollständig kartieren
-- [ ] Spinne, Kanalraum, Wasserraum state-Werte
+- [ ] state=317 (im marenga-Port "SpiderWeb", in dieser Doku "Schicksalstür/Glücksrad") – noch nicht beobachtet, nach dem state=316-Fund mit Vorsicht zu genießen
+- [ ] state=306 per Video bestätigen (aktuell nur "kein messbarer Effekt" belegt, nicht was visuell passiert)
+- [ ] Restliche Golden-Room-states (302, 311, 313, 319, 320, 324–328 im marenga-Port benannt) gegen echte Captures prüfen – ungetestet übernommen
+- [ ] Fluchhändler (state=323) und `IADungeonDebuffMerchantBuy` noch nicht in echten Daten gesehen
 
 ---
 
 ## Quellen
 
 - HAR-Aufzeichnungen: 80+ Charakter-Runs auf verschiedenen Servern (F9, F25, F28)
+- Gezielter zweiter Durchgang 2026-09-19: 7 Accounts (F9, F23, F25, F28, S5, S6, S7),
+  aufgezeichnet um die Annahmen im marenga-PR `feat/legendary-dungeon`
+  (the-marenga/mfbot#454, ungetestet) zu verifizieren
 - Playa Games Helpshift: https://playa-games.helpshift.com/hc/de/4-shakes-fidget-1653988985/faq/57-legendary-dungeon/
 - ldgadget.12hp.de: https://ldgadget.12hp.de
