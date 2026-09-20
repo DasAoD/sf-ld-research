@@ -279,15 +279,10 @@ Gilt wenn `state=100` (Interaktionsraum).
 
 | monster | Bedeutung |
 |---------|-----------|
-| `100` | Holzkiste (Gold / Ressourcen) |
-| `101` | Fass (mit Item, Enum vermutlich `Barrel`, bestätigt 2026-09-20 für `Interacted with the encounter (Barrel)`) |
-| `102` | Holzkiste (mit Item) |
-| `400` | Fass (mit Segen oder Fluch) |
-
-> **Neu, unbestätigt (2026-09-20):** Belohnungen hinter `LockedDoor` erscheinen
-> in Logs als `Collected the reward (Crate1/2/3)` – drei Tiers gesehen, kein
-> `Crate0`. Noch keine 1:1-Zuordnung zu den `monster`-IDs oben, evtl. ein
-> separates, Tür-gebundenes Belohnungssystem statt der `state=100`-Interaktionsräume.
+| `100` | Holzkiste (Gold / Ressourcen) – Enum: `Crate1`, bestätigt 2026-09-20 (Live-Log zeigte `Collected the reward (Crate1)`) |
+| `101` | **Korrektur (2026-09-20):** nicht "Fass", Enum ist `Crate2` (Code-Quelle `LegendaryDungeon.cs`) – vermutlich eine zweite Holzkisten-Tier-Stufe, kein Fass |
+| `102` | Holzkiste (mit Item) – Enum: `Crate3`, bestätigt 2026-09-20 |
+| `400` | Fass (mit Segen oder Fluch) – Enum: `Barrel`, bestätigt 2026-09-20 (`Interacted with the encounter (Barrel)`) |
 
 ### Skelette
 
@@ -383,21 +378,31 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/1/-315`
 
 ## Segen & Flüche – bekannte usedbuffs-IDs
 
-| buff_id | Typ | Bedeutung |
-|---------|-----|-----------|
-| `1` | Segen | Plünderer (+100% Gold in 10 Kammern) oder Weg der Besserung |
-| `2` | Segen | One Hit Wonder (Monster sofort töten) |
-| `4` | Segen? | ? |
-| `5` | Segen | Dietrich (Enum: `LockPick`, bestätigt 2026-09-20 – gekauft beim Schlüsselmeister) (nächste 4 Türen ohne Schlüssel öffnen) |
-| `6` | Segen | Schlüsselerlebnis (70% Chance auf 2 Schlüssel in 8 Kämpfen) |
-| `8` | Segen | Weg der Besserung (HP-Heilung nach Raum) |
-| `101` | Fluch | Kaputte Rüstung (Gegner verursacht +50% Schaden für 4/8 Räume) |
-| `102` | Fluch | 5% Schaden pro Raum für 5 Räume |
-| `104` | Fluch | 50% Gold aus Truhen für 5/10 Kammern |
-| `105` | Fluch | Starke Verschlüsselung (doppelte Schlüsselkosten für 4/8 Türen) |
-| `?` | Segen | Enum `KeyMoment`, bestätigt 2026-09-20 beim Schlüsselmeister gekauft – buff_id und genauer Effekt noch unbekannt (Name deutet auf schlüsselbezogenen Bonus) |
-| `?` | Segen | Enum `EscapeAssistant`, bestätigt 2026-09-20 beim Schlüsselmeister gekauft – buff_id und genauer Effekt noch unbekannt (Name deutet auf Fluchtchance-Bonus) |
-| – | Verbrauchsgegenstand | Enum `ElixirOfLife`, bestätigt 2026-09-20 – das im Schlüsselmeister-Shop erwähnte Lebenselixier (25%/50% HP), kein Segen/buff_id, sofort verbraucht |
+> **Quelle ab 2026-09-20:** vollständig gegen den `DungeonEffectType`-Enum in
+> `LegendaryDungeon.cs` (marenga-Port) abgeglichen. Die Code-Kommentare dort
+> sind eigene Doku von marenga, nicht aus offizieller Quelle – wo unsere
+> Live-/Wiki-Daten abweichen, ist das unten vermerkt.
+
+| buff_id | Enum | Typ | Bedeutung |
+|---------|------|-----|-----------|
+| `1` | `Raider` | Segen | Plünderer (+100% Gold in 10 Kammern) oder Weg der Besserung |
+| `2` | `OneHitWonder` | Segen | One Hit Wonder (Monster sofort töten) |
+| `3` | `EscapeAssistant` | Segen | Bessere Fluchtchance (bestätigt 2026-09-20, gekauft beim Schlüsselmeister – genaue % laut Code-Kommentar offen) |
+| `4` | `DisarmTraps` | Segen | Entschärft die nächsten X Fallen (löst die alte offene Frage "buff_id 4 = ?") |
+| `5` | `LockPick` | Segen | Dietrich – bestätigt 2026-09-20 beim Schlüsselmeister gekauft (nächste 4 Türen ohne Schlüssel öffnen) |
+| `6` | `KeyMoment` | Segen | Schlüsselerlebnis – bestätigt 2026-09-20 beim Schlüsselmeister gekauft. **Diskrepanz:** Code-Kommentar sagt "50% Chance auf 2 Schlüssel", ältere Doku-Quelle sagte 70% über 8 Kämpfe – ungeklärt, welcher Wert stimmt |
+| `7` | `ElixirOfLife` | Segen | Sofort-HP-Heilung. **Korrektur:** hier fälschlich als reiner Shop-Verbrauchsgegenstand ohne buff_id notiert gewesen – ist tatsächlich ein regulärer Segen-Effekt mit eigener buff_id |
+| `8` | `RoadToRecovery` | Segen | Weg der Besserung (HP-Heilung nach Raum) |
+| `101` | `BrokenArmor` | Fluch | Kaputte Rüstung (Gegner verursacht +50% Schaden für 4/8 Räume) |
+| `102` | `Poisoned` | Fluch | 5% Schaden pro Raum für 5 Räume |
+| `103` | `Panderous` | Fluch | Geringere Fluchtchance (bisher komplett unbekannt gewesen, jetzt aus dem Code ergänzt – noch keine Live-Bestätigung) |
+| `104` | `GoldRushHangover` | Fluch | 50% Gold aus Truhen für 5/10 Kammern |
+| `105` | `HardLock` | Fluch | Starke Verschlüsselung (doppelte Schlüsselkosten für 4/8 Türen) |
+
+> **Für `EscapeAssistant`/`DisarmTraps`/`Panderous`:** Enum-Namen und
+> grobe Bedeutung stammen aus `LegendaryDungeon.cs`, aber (außer bei
+> `EscapeAssistant`) noch nicht durch eigene Live-Daten/Wiki verifiziert –
+> reine marenga-Doku, mit Vorsicht zu genießen.
 
 ---
 
@@ -461,7 +466,7 @@ Leuchten). **Offiziell dokumentiert** im Playa-Wiki:
 | `307` | Wunschbrunnen | Münze einwerfen → Item oder Segen; kein Auswahlfeld |
 | `308` | Schere-Stein-Papier | Sieg: Segen + Item; Niederlage: Fluch + Schaden; Unentschieden: nichts |
 | `309` | Kanalisation | Brühe durchsuchen → Item; Verlassen ohne Strafe |
-| `310` | Laternenmonster (vermutlich Enum: `UndeadFiend`, unbestätigt – Log zeigt `Activated the room bonus (UndeadFiend)` direkt nach einer goldenen Tür, passt thematisch, aber keine 1:1-Bestätigung über eine Response mit explizitem `state=310`) | Kampf oder Flucht gegen das Monster mit Laterne |
+| `310` | Laternenmonster (Enum: `UndeadFiend`, bestätigt 2026-09-20 – exakter Wert `310` direkt aus `LegendaryDungeon.cs`, deckt sich mit dem Live-Log-Fund) | Kampf oder Flucht gegen das Monster mit Laterne |
 | `312` | Sarkophag (Enum: `UnlockedSarcophagus`, bestätigt 2026-09-20) | Unverschlossen: Gold. Verschlossen (Schlüssel nötig): garantiert episches Item. |
 | `314` | Holzstapel | Wegräumen für Festungslager-Ressourcen (Holz/Stein/Metall) |
 | `315` | Schlüsselmeister-Shop | Segen gegen Schlüssel (siehe "Eigene Endpoints") |
@@ -617,9 +622,9 @@ wieder rein. **Bestätigt am 2026-09-19 per UI-Screenshot** (Account auf S7 bei
 - [x] Segen/Fluch-Mechanik (Stapel-, Slot- und Boss-Immunitätsregeln) offiziell dokumentiert, siehe "Segen & Flüche – Mechanik-Regeln"
 - [ ] Pilz-Preisstaffelung bei mehrfacher Heilnutzung im selben Run (10→15→20 laut Wiki) noch nicht mit echten Daten verifiziert
 - [x] **Neu (2026-09-20):** Enum-Namen (marenga-Port) für zahlreiche bereits dokumentierte States/Monster live bestätigt: Hungrige Türen (`Wood`/`Stone`/`Metal`/`Arcane`/`Souls`/`QuicksandGlasses`), Goldene Räume (`FountainOfLife`=301, `PileOfRocks`=303, `TheFloorIsLava`=304, `UnlockedSarcophagus`=312, `SoulBath`=321), Truhen (`BronzeChest`/`SilverChest`/`EpicChest`/`MimicChest`=500/`SatedChest`=603), Skelette (`MageSkeleton`=300/`WarriorSkeleton`=301), Prüfungspforte (`TrialRoom1`), Segen (`LockPick`=buff_id 5)
-- [ ] **Neu (2026-09-20):** Zwei neue Segen-Namen beim Schlüsselmeister gekauft, buff_id unbekannt: `KeyMoment`, `EscapeAssistant`. Sowie `ElixirOfLife` als vermutliches Lebenselixier (Verbrauchsgegenstand, kein Segen)
-- [ ] **Neu (2026-09-20):** `UndeadFiend`-Raumbonus nach goldener Tür beobachtet – vermutlich das schon bekannte Laternenmonster (state=310), aber ohne expliziten State-Beleg noch unbestätigt
-- [ ] **Neu (2026-09-20):** Belohnungen `Crate1`/`Crate2`/`Crate3` hinter `LockedDoor` – Zuordnung zu den `monster`-IDs der Kisten/Fässer-Tabelle noch offen
+- [x] **Neu (2026-09-20), gelöst durch Code-Abgleich:** `KeyMoment`=buff_id 6, `EscapeAssistant`=buff_id 3, `ElixirOfLife`=buff_id 7 (ist doch ein Segen, keine reine Kaufware) – dazu gleich zwei alte Lücken mitgelöst: buff_id 4 (`DisarmTraps`) und buff_id 103 (`Panderous`, komplett neu). Offen bleibt die 50%-vs-70%-Diskrepanz bei `KeyMoment`, siehe Segen-Tabelle
+- [x] **Neu (2026-09-20), gelöst durch Code-Abgleich:** `UndeadFiend` = state `310` (Laternenmonster) exakt bestätigt
+- [x] **Neu (2026-09-20), gelöst durch Code-Abgleich:** `Crate1`/`Crate2`/`Crate3` = `monster` `100`/`101`/`102` – `101` ist entgegen der alten Doku kein Fass, das ist ausschließlich `Barrel`=`400`
 
 ---
 
