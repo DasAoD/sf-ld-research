@@ -266,30 +266,35 @@ Gilt wenn `state=100` (Interaktionsraum).
 
 | monster | Bedeutung |
 |---------|-----------|
-| `0` | Bronzene Schatztruhe |
-| `1` | Silberne Schatztruhe |
-| `2` | Epische Schatztruhe |
-| `500` | Gefräßige Schmatztruhe (verwandelt sich in Monster) |
+| `0` | Bronzene Schatztruhe (Enum: `BronzeChest`) |
+| `1` | Silberne Schatztruhe (Enum: `SilverChest`) |
+| `2` | Epische Schatztruhe (Enum: `EpicChest`, bestätigt 2026-09-20) |
+| `500` | Gefräßige Schmatztruhe (Enum: `MimicChest`, bestätigt 2026-09-20 – wird über `Interacted with` → `Fighting the encounter` abgewickelt, bestätigt "verwandelt sich in Monster") |
 | `600` | Opfertruhe |
 | `601` | Verfluchte Truhe |
 | `602` | Notausgang-Preis-Truhe |
-| `603` | Satte Kiste (hinter Hungriger Tür) |
+| `603` | Satte Kiste (Enum: `SatedChest`, bestätigt 2026-09-20, hinter Hungriger Tür) |
 
 ### Kisten & Fässer
 
 | monster | Bedeutung |
 |---------|-----------|
 | `100` | Holzkiste (Gold / Ressourcen) |
-| `101` | Fass (mit Item) |
+| `101` | Fass (mit Item, Enum vermutlich `Barrel`, bestätigt 2026-09-20 für `Interacted with the encounter (Barrel)`) |
 | `102` | Holzkiste (mit Item) |
 | `400` | Fass (mit Segen oder Fluch) |
+
+> **Neu, unbestätigt (2026-09-20):** Belohnungen hinter `LockedDoor` erscheinen
+> in Logs als `Collected the reward (Crate1/2/3)` – drei Tiers gesehen, kein
+> `Crate0`. Noch keine 1:1-Zuordnung zu den `monster`-IDs oben, evtl. ein
+> separates, Tür-gebundenes Belohnungssystem statt der `state=100`-Interaktionsräume.
 
 ### Skelette
 
 | monster | Bedeutung |
 |---------|-----------|
-| `300` | Magierskelett |
-| `301` | Kriegerskelett |
+| `300` | Magierskelett (Enum: `MageSkeleton`, bestätigt 2026-09-20) |
+| `301` | Kriegerskelett (Enum: `WarriorSkeleton`, bestätigt 2026-09-20) |
 
 ### Sonstiges
 
@@ -383,19 +388,23 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/1/-315`
 | `1` | Segen | Plünderer (+100% Gold in 10 Kammern) oder Weg der Besserung |
 | `2` | Segen | One Hit Wonder (Monster sofort töten) |
 | `4` | Segen? | ? |
-| `5` | Segen | Dietrich (nächste 4 Türen ohne Schlüssel öffnen) |
+| `5` | Segen | Dietrich (Enum: `LockPick`, bestätigt 2026-09-20 – gekauft beim Schlüsselmeister) (nächste 4 Türen ohne Schlüssel öffnen) |
 | `6` | Segen | Schlüsselerlebnis (70% Chance auf 2 Schlüssel in 8 Kämpfen) |
 | `8` | Segen | Weg der Besserung (HP-Heilung nach Raum) |
 | `101` | Fluch | Kaputte Rüstung (Gegner verursacht +50% Schaden für 4/8 Räume) |
 | `102` | Fluch | 5% Schaden pro Raum für 5 Räume |
 | `104` | Fluch | 50% Gold aus Truhen für 5/10 Kammern |
 | `105` | Fluch | Starke Verschlüsselung (doppelte Schlüsselkosten für 4/8 Türen) |
+| `?` | Segen | Enum `KeyMoment`, bestätigt 2026-09-20 beim Schlüsselmeister gekauft – buff_id und genauer Effekt noch unbekannt (Name deutet auf schlüsselbezogenen Bonus) |
+| `?` | Segen | Enum `EscapeAssistant`, bestätigt 2026-09-20 beim Schlüsselmeister gekauft – buff_id und genauer Effekt noch unbekannt (Name deutet auf Fluchtchance-Bonus) |
+| – | Verbrauchsgegenstand | Enum `ElixirOfLife`, bestätigt 2026-09-20 – das im Schlüsselmeister-Shop erwähnte Lebenselixier (25%/50% HP), kein Segen/buff_id, sofort verbraucht |
 
 ---
 
 ## Prüfungspforte & Notausgang
 
 ### Prüfungspforte
+- Enum im marenga-Port: `TrialRoom1`–`TrialRoom5` (bestätigt 2026-09-20, `TrialRoom1` als Türtyp in Live-Logs gesehen)
 - Erscheint maximal einmal pro Dungeon-Run, nie in Ebene 1
 - Kein Schlüssel erforderlich
 - Dahinter immer ein Monster-Raum (state=2 oder 3)
@@ -419,6 +428,19 @@ Beispiel: `iamap:25/-5142/1/315/25/-5144/1/-315/25/-5146/1/-315/25/-5148/1/-315`
 - Dahinter immer eine Satte Kiste (monster=`603`)
 - Satte Kiste enthält Ressourcen (Seelen, Holz, Arkane Splitter, etc.)
 - Kein Schlüssel nötig
+- **Bestätigt per Live-Logs (2026-09-20):** Türauswahl zeigt die Ressource direkt
+  als eigenen Türtyp (nicht "MysteryDoor"), Wahl führt sofort zu `Collected the
+  reward (SatedChest)` – kein Kampf/Encounter dazwischen. Enum-Namen im
+  marenga-Port ↔ Ressource:
+
+| Enum-Name | Ressource (DE) |
+|-----------|-----------------|
+| `Wood` | Holz |
+| `Stone` | Stein |
+| `Metal` | Metall |
+| `Arcane` | Arkane Splitter |
+| `Souls` | Seelen |
+| `QuicksandGlasses` | Sanduhren |
 
 ---
 
@@ -431,21 +453,21 @@ Leuchten). **Offiziell dokumentiert** im Playa-Wiki:
 
 | state | Raumtyp | Inhalt |
 |-------|---------|--------|
-| `301` | Lebensbrunnen | Heilt einen Teil der Lebensenergie (Basisversion). Spezialvariante entfernt zusätzlich Flüche. |
-| `303` | Steinhaufen | Versperrt den Weg; Wegräumen bringt Steine fürs Festungslager |
-| `304` | Der Boden ist Lava | Pflicht-Durchquerung, kostet Lebensenergie |
+| `301` | Lebensbrunnen (Enum: `FountainOfLife`, bestätigt 2026-09-20) | Heilt einen Teil der Lebensenergie (Basisversion). Spezialvariante entfernt zusätzlich Flüche. |
+| `303` | Steinhaufen (Enum: `PileOfRocks`, bestätigt 2026-09-20) | Versperrt den Weg; Wegräumen bringt Steine fürs Festungslager |
+| `304` | Der Boden ist Lava (Enum: `TheFloorIsLava`, bestätigt 2026-09-20) | Pflicht-Durchquerung, kostet Lebensenergie |
 | `305` | Dungeon-Erzähler | Tee trinken: HP + Segen; ablehnen: kein Effekt |
-| `306` | **Überfluteter Raum** (nicht "kein Effekt") – Raum füllt sich mit Wasser, wer nicht **innerhalb von 10 Sekunden** verlässt, ertrinkt. Erklärt, warum unser HAR-Test keinen Effekt zeigte: der Bot verlässt sofort per `param=50`, lange bevor die 10s um sind. |
+| `306` | **Überfluteter Raum** (Enum: `FloodedRoom`, bestätigt) (nicht "kein Effekt") – Raum füllt sich mit Wasser, wer nicht **innerhalb von 10 Sekunden** verlässt, ertrinkt. Erklärt, warum unser HAR-Test keinen Effekt zeigte: der Bot verlässt sofort per `param=50`, lange bevor die 10s um sind. |
 | `307` | Wunschbrunnen | Münze einwerfen → Item oder Segen; kein Auswahlfeld |
 | `308` | Schere-Stein-Papier | Sieg: Segen + Item; Niederlage: Fluch + Schaden; Unentschieden: nichts |
 | `309` | Kanalisation | Brühe durchsuchen → Item; Verlassen ohne Strafe |
-| `310` | Laternenmonster | Kampf oder Flucht gegen das Monster mit Laterne |
-| `312` | Sarkophag | Unverschlossen: Gold. Verschlossen (Schlüssel nötig): garantiert episches Item. |
+| `310` | Laternenmonster (vermutlich Enum: `UndeadFiend`, unbestätigt – Log zeigt `Activated the room bonus (UndeadFiend)` direkt nach einer goldenen Tür, passt thematisch, aber keine 1:1-Bestätigung über eine Response mit explizitem `state=310`) | Kampf oder Flucht gegen das Monster mit Laterne |
+| `312` | Sarkophag (Enum: `UnlockedSarcophagus`, bestätigt 2026-09-20) | Unverschlossen: Gold. Verschlossen (Schlüssel nötig): garantiert episches Item. |
 | `314` | Holzstapel | Wegräumen für Festungslager-Ressourcen (Holz/Stein/Metall) |
 | `315` | Schlüsselmeister-Shop | Segen gegen Schlüssel (siehe "Eigene Endpoints") |
 | `316` | **Glücksrad – bestätigt per Videoaufnahme (2026-09-19), unsere frühere "vermutlich nicht Glücksrad"-These war falsch.** Das Rad hat 8 Felder (Gold, 2x Fluch-Symbol, 2x Segen-Symbol, Schlüssel+1, Schlüssel-1). Beide unabhängig aufgezeichneten Drehungen (F25, S5) landeten zufällig auf "Gold" – der angezeigte Münz-Betrag (`13.150.028` bzw. `13.609.424`, ×100 skaliert) deckt sich exakt mit dem in `iadungeonsave[23]` gefundenen und gegen `resources` verifizierten Betrag. Der marenga-PR hat mit `WheelOfFortune` also recht. **Bleibt aber ein offener Punkt:** Der marenga-Tasker behandelt `WheelOfFortune` als reinen HP-Risiko-Raum (`HandleDamageRoom`, HP-%-gated) – das eigentliche Risiko hier ist aber Fluch/Schlüsselverlust, nicht direkter HP-Schaden. Ob die HP-basierte Gating-Logik für diesen Raumtyp überhaupt die richtige Dimension ist, ist fraglich, siehe TODO in `LegendaryDungeon.cs`. |
 | `317` | Vermutlich **Spinnennetz** (marenga-PR: `SpiderWeb`) – 3 Varianten mit steigendem Risiko: Beine sichtbar (viele Schlüssel, wenig Gift-Risiko), Kopf sichtbar (Gleichstand 2 Schlüssel oder Gift), ganze Spinne (hohes Gift-Risiko, seltene 5-Schlüssel-Belohnung). Noch nicht in echten Daten gesehen. |
-| `321` | Seelenbad | Klicken schreibt Seelen in der Unterwelt gut |
+| `321` | Seelenbad (Enum: `SoulBath`, bestätigt 2026-09-20) | Klicken schreibt Seelen in der Unterwelt gut |
 | `322` | Arkane Splitter-Höhle | Splitter sammeln für den Schmied |
 | `323` | Scheibenkleistermeister (Fluchhändler) | Kauft Schlüssel gegen Flüche – **bestätigt 2026-09-19**, Effekt `104` gekauft |
 | `329` | Zeughaus (Räume 90–98) | Episches Item (10% Chance legendär bei 2 Waffen) |
@@ -501,15 +523,15 @@ Auswahl per `IADungeonSelectSoulStone:{typ}` (siehe Endpoints oben).
 | C | Hoffnung des Verdurstenden | Hope of the Thirsty One | Mehr verfluchte Türen | – |
 | C | Verfluchte Perle | Cursed Pearl | – | – |
 | C | Blutstropfen der Opfergabe | Blood Drop of Sacrifice | Weniger Schaden durch Opfertüren | – |
-| D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Tøren |
-| E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Tøren | – |
+| D | Smaragd des Forschers | Emerald of the Explorer | – | Weniger geheimnisvolle Türen |
+| E | Saphir des Pechvogels | Sapphire of the Misadventurer | Weniger verfluchte Türen | – |
 | E | Kronjuwel des Teufels | Crown Jewel of the Devil | Chance auf epische Türen | Monster hinter Türen |
 | F | Findling des Tölpels | **Erratic Boulder of the Hick** (bestätigt 2026-09-19, id `16`) | -Opfertüren | +30% Schaden bei Flucht-Fail |
 | F | Kiesel der Hinterlist | Pebble of Deceit | Monster weniger Schaden | Monster hinter Türen |
 | F | Magnetstein | Lodestone | Doppelt verschlossene Türen; +Schlüssel | – |
 | F | Auge des Stiers | Eye of the Bull (bestätigt 2026-09-19, id `1`) | -20% Monsterschaden | -30% Fluchtchance |
 | F | Irrender Brocken des Tölpels | ~~Erratic Boulder of the Hick~~ **Duplikat?** | -Opfertüren | – |
-| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen hinter Tøren | – |
+| F | Nierenstein der Zielstrebigkeit | Kidney Stone of Determination | Verfluchte Truhen hinter Türen | – |
 | F | Alter Opferstein | Old Sacrifice Stone | Weniger Schaden Opfertruhen | – |
 
 > **Datenqualität der Tier-Liste:** "Findling des Tölpels" und "Irrender Brocken
@@ -583,7 +605,7 @@ wieder rein. **Bestätigt am 2026-09-19 per UI-Screenshot** (Account auf S7 bei
 - [x] Händler-Kauf-Endpoint: `IADungeonMerchantBuy`/`IADungeonDebuffMerchantBuy`, kein `param=70` (siehe "Eigene Endpoints")
 - [x] iadungeonsave `[15]`=Stage, `[17]`=Etage, `[18]`=Max-Etage, `[19]`/`[20]`=Türtypen (im DoorSelect) bzw. Raumzustand, `[23]`=Gold-Betrag (state=316)
 - [ ] iadungeonsave restliche Felder `[5]`–`[14]`, `[16]`, `[21]`, `[24]`, `[27]`–`[50]` (Segen/Fluch-Slots, Merchant-Angebote etc. – siehe marenga-Port `LegendaryDungeon.cs` für Kandidaten-Layout, aber ungetestet)
-- [ ] buff_id=1 genauer klären (Plønderer vs. Weg der Besserung)
+- [ ] buff_id=1 genauer klären (Plünderer vs. Weg der Besserung)
 - [ ] Boss-Varianten A/B vollständig kartieren
 - [x] state=306 gelöst: **Überfluteter Raum**, laut Wiki 10-Sekunden-Ertrink-Timer – kein Widerspruch mehr zu "kein messbarer Effekt" im HAR (Bot verlässt sofort)
 - [x] state=316 gelöst: **Glücksrad**, per Videoaufnahme bestätigt (2026-09-19) – marenga-PR hatte recht, unsere Zwischenthese "vermutlich nicht Glücksrad" war falsch. Offen bleibt, ob die HP-basierte Risiko-Bewertung im Tasker für diesen Raumtyp die richtige Dimension ist (Risiko ist Fluch/Schlüssel, nicht HP)
@@ -594,6 +616,10 @@ wieder rein. **Bestätigt am 2026-09-19 per UI-Screenshot** (Account auf S7 bei
 - [ ] **Neu:** Boss-Monster-IDs scheinen Theme-abhängig zu sein – aktuelles Event (`AbyssOfMadness`) nutzt `-5297`(Boss 1)/`-5298`(Boss 2), komplett anders als die alte Tabelle (`-514x`). Zweiter Run nötig, um Variante A/B zu klären
 - [x] Segen/Fluch-Mechanik (Stapel-, Slot- und Boss-Immunitätsregeln) offiziell dokumentiert, siehe "Segen & Flüche – Mechanik-Regeln"
 - [ ] Pilz-Preisstaffelung bei mehrfacher Heilnutzung im selben Run (10→15→20 laut Wiki) noch nicht mit echten Daten verifiziert
+- [x] **Neu (2026-09-20):** Enum-Namen (marenga-Port) für zahlreiche bereits dokumentierte States/Monster live bestätigt: Hungrige Türen (`Wood`/`Stone`/`Metal`/`Arcane`/`Souls`/`QuicksandGlasses`), Goldene Räume (`FountainOfLife`=301, `PileOfRocks`=303, `TheFloorIsLava`=304, `UnlockedSarcophagus`=312, `SoulBath`=321), Truhen (`BronzeChest`/`SilverChest`/`EpicChest`/`MimicChest`=500/`SatedChest`=603), Skelette (`MageSkeleton`=300/`WarriorSkeleton`=301), Prüfungspforte (`TrialRoom1`), Segen (`LockPick`=buff_id 5)
+- [ ] **Neu (2026-09-20):** Zwei neue Segen-Namen beim Schlüsselmeister gekauft, buff_id unbekannt: `KeyMoment`, `EscapeAssistant`. Sowie `ElixirOfLife` als vermutliches Lebenselixier (Verbrauchsgegenstand, kein Segen)
+- [ ] **Neu (2026-09-20):** `UndeadFiend`-Raumbonus nach goldener Tür beobachtet – vermutlich das schon bekannte Laternenmonster (state=310), aber ohne expliziten State-Beleg noch unbestätigt
+- [ ] **Neu (2026-09-20):** Belohnungen `Crate1`/`Crate2`/`Crate3` hinter `LockedDoor` – Zuordnung zu den `monster`-IDs der Kisten/Fässer-Tabelle noch offen
 
 ---
 
