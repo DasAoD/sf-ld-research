@@ -600,6 +600,7 @@ wieder rein. **Bestätigt am 2026-09-19 per UI-Screenshot** (Account auf S7 bei
 ## Noch zu erforschen
 
 - [x] Legendäre Truhe nach Endboss: Run endet nach Item einpacken, kein Post-state, direkt Auswahlbildschirm
+- [x] **Neu (2026-09-22), per HAR bestätigt:** Ein 2. Run nach Abschluss des 1. Runs wird mit **denselben** `IADungeonStart`-Parametern gestartet (`Theme/0`, kein eigener Run-Index nötig). Antwort zeigt vollen HP-Reset und Etage 0. Löst nebenbei einen Bot-Bug: der marenga-Port interpretierte den Abschluss eines Runs (`Stage.Finished`) fälschlich als Event-Ende und trat nie wieder ein, siehe [mfbot-local#50](https://git.uliana.de/DasAoD/mfbot-local/issues/50)
 - [x] Hungrige Tür: `param=40`, akzeptiert Arkane Splitter / Sanduhren / Seelen / Steine
 - [x] SSP: `param=90` = Stein, `param=91` = Papier, `param=92` = Schere; `monster=90/91/92` = Gleichstand Stein/Papier/Schere
 - [x] Sarkophag: state=312 (Gold)
